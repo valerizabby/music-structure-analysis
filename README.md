@@ -1,42 +1,37 @@
-# SYMBOLIC MUSIC STRUCTURE ANALYSIS
+# Symbolic Music Structure Analysis
 
-This repository contains the code to replicate the results of the paper: [Symbolic Music Structure Analysis with Graph Representations and Changepoint Detection Methods](https://arxiv.org/abs/2303.13881).
+[🌹 cтатья](https://arxiv.org/abs/2303.13881)
 
+[🌹 гитхаб](https://github.com/carlosholivan/symbolic-music-structure-analysis)
 
-## Requirements
-- pyenv
+### 📚 идея статьи
+
+MIR - Music Information Retrieval - хотим сегментировать музыкальную структуру. Предложено 3 алгоритма, два их них
+основаны на графах. 
+Музыка кодируется в граф, граф в матрицу инцидентности, матрица в кривую новизны (novelty curve), а к кривой
+применяются changepoint detection алгоритмы. По мнению авторов, дополнительного feature extraction из музыки не требуется (точка роста?)
+
+## 💎 окружение
+- клонируем репозиторий 
+
+    ```bash
+    git clone https://github.com/carlosholivan/symbolic-music-structure-analysis.git
+    ```
 - python version >= 3.9
-
-``` python3 -m pip install --upgrade pip ```
-
-``` pyenv install -v 3.9.0 ```
-
-``` pyenv local 3.9.0 ```
-
-- pip version 24.0 
-` python3 -m pip install --upgrade pip `
-
 - musicaiz version 0.1.0
 
-```pip install musicaiz==0.1.0```
+  ```bash
+  pip install musicaiz==0.1.0
+  ```
 
-## Files in this repository
+## 💎 структура кода
 
-`bps_midi.py`: converts the BPS notes.csv files in MIDI files.
+- `bps_midi.py`: конвертирует BPS notes.csv файлы в MIDI файлы ✅
+  
+- `graph_figure1.py`: создает рисунок с BPS-файлом, в котором показана кривая новизны и матрицы инцидентности графа с аннотациями структуры и предсказаниями ✅
 
-`graph_figure1.py`: prepares a figure with a BPS file in which the novelty cursve of the graph adjajency matrix is shown with structure annotations and predictions per level.
+- `figure_ssm.py`: создает рисунок с BPS-файлом, в котором показаны кандидаты на границу и SSM с кривой новизны для Norm алгоритма (в 12 строке поменять путь до файла BPS_FH_Dataset на свой) ✅
 
-`figure_ssm.py`: prepares a figure with a BPS file in which the boundary candidates and SSM with novelty curve are shown for Norm algorithm.
+- `dataset_analysis.py`: аналитика SWD и BPS датасетов (в 12 строке поменять путь до файла BPS_FH_Dataset на свой) ✅
 
-`dataset_analysis.py`: gets the analytics of the SWD and BPS datasets.
-
-Code for reproducibility:
-- `graph_bps.py`
-- `norm_bps.py`
-- `graph_swd.py`
-- `norm_swd.py`
-
-## Authors
-
-- Carlos Hernandez-Olivan
-- Sonia Rubio Llamas
+Спросить MIDI трек на русском (?)
