@@ -60,7 +60,7 @@ def bps_to_midi(file, time_sig, dest_path):
 
     midi.write(dest_path)
 
-data_dir = Path("H:/INVESTIGACION/Datasets/functional-harmony-master/BPS_FH_Dataset")
+data_dir = Path("BPS_FH_Dataset")
 for file in data_dir.glob("*"):
     if file.is_file():
         continue

@@ -9,7 +9,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 from musicaiz.datasets.bps_fh import BPSFH
 
-dataset = Path("H:/INVESTIGACION/Datasets/functional-harmony-master/BPS_FH_Dataset")
+dataset = Path("BPS_FH_Dataset")
 
 data = BPSFH(dataset)
 

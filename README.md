@@ -4,10 +4,21 @@ This repository contains the code to replicate the results of the paper: [Symbol
 
 
 ## Requirements
+- pyenv
+- python version >= 3.9
 
-```
-musicaiz==0.1.0
-```
+``` python3 -m pip install --upgrade pip ```
+
+``` pyenv install -v 3.9.0 ```
+
+``` pyenv local 3.9.0 ```
+
+- pip version 24.0 
+` python3 -m pip install --upgrade pip `
+
+- musicaiz version 0.1.0
+
+```pip install musicaiz==0.1.0```
 
 ## Files in this repository
 
