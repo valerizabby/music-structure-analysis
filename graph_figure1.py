@@ -272,6 +272,5 @@ def make_graph_figure(path_string):
 
 
 if __name__ == '__main__':
-    #make_graph_figure('app/data/upload_files_from_localhost/soldat.mid')
-    make_graph_figure('BPS_FH_Dataset/1/1.mid')
+    make_graph_figure('app/data/upload_files_from_localhost/soldat.mid')
 
