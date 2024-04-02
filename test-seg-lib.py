@@ -16,6 +16,7 @@ def get_sum_of_cost(algo, n_bkps):
         bkps = algo.predict(n_bkps=n_bkps)
         return algo.cost.sum_of_costs(bkps)
 
+
 def plot_decision_graph(algo, array_of_n_bkps):
     fig, ax = fig_ax((7, 4))
     ax.plot(
@@ -33,8 +34,30 @@ def plot_decision_graph(algo, array_of_n_bkps):
     print("Pic saved to 'foo.png'")
 
 
+def compute_tempogram(sampling_rate, oenv, hop_length_tempo):
+    # Compute the tempogram
+    tempogram = librosa.feature.tempogram(
+        onset_envelope=oenv,
+        sr=sampling_rate,
+        hop_length=hop_length_tempo,
+    )
+    # Display the tempogram
+    fig, ax = fig_ax()
+    _ = librosa.display.specshow(
+        tempogram,
+        ax=ax,
+        hop_length=hop_length_tempo,
+        sr=sampling_rate,
+        x_axis="s",
+        y_axis="tempo",
+    )
+    fig.savefig("tempo.png")
+    print("Tempogram saved")
+    return tempogram
+
+
 if __name__ == "__main__":
-    duration = 60  # in seconds
+    duration = 213  # in seconds
     #print(librosa.ex("nutcracker"))
     filename = '/Users/21415968/Desktop/Nirvana-Smells-like-teen-spirit.ogg'
     signal, sampling_rate = librosa.load(filename, duration=duration)
@@ -55,22 +78,8 @@ if __name__ == "__main__":
     oenv = librosa.onset.onset_strength(
         y=signal, sr=sampling_rate, hop_length=hop_length_tempo
     )
-    # Compute the tempogram
-    tempogram = librosa.feature.tempogram(
-        onset_envelope=oenv,
-        sr=sampling_rate,
-        hop_length=hop_length_tempo,
-    )
-    # Display the tempogram
-    fig, ax = fig_ax()
-    _ = librosa.display.specshow(
-        tempogram,
-        ax=ax,
-        hop_length=hop_length_tempo,
-        sr=sampling_rate,
-        x_axis="s",
-        y_axis="tempo",
-    )
+
+    tempogram = compute_tempogram(sampling_rate, oenv, hop_length_tempo)
     # Choose detection method
     algo = rpt.KernelCPD(kernel="linear").fit(tempogram.T)
 
@@ -85,7 +94,7 @@ if __name__ == "__main__":
     plot_decision_graph(algo, array_of_n_bkps)
 
     # Visually we choose n_bkps=5 (highlighted in red on the elbow plot)
-    n_bkps = 3
+    n_bkps = 6
     _ = ax.scatter([5], [get_sum_of_cost(algo=algo, n_bkps=5)], color="r", s=100)
 
 
@@ -97,6 +106,8 @@ if __name__ == "__main__":
     # Displaying results
     fig, ax = fig_ax()
     _ = librosa.display.specshow(tempogram,ax=ax,x_axis="s",y_axis="tempo",hop_length=hop_length_tempo,sr=sampling_rate,)
+    fig.savefig("result.png")
+    print("Result file saved")
 
     for b in bkps_times[:-1]:
         ax.axvline(b, ls="--", color="white", lw=4)
