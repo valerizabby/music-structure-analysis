@@ -1,6 +1,6 @@
 torch==1.11.0
-numpy==1.19.0
 flask==3.0.2
 librosa==0.10.1
 ipython==8.20.0
 midi2audio==0.1.1
+msaf==0.1.80

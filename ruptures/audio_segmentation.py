@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import librosa
 import numpy as np
-from IPython.display import Audio, display
+import os
 
+from config import CONTENT_ROOT
 import ruptures as rpt
 
 # Choose the number of changes (elbow heuristic)
@@ -59,12 +60,13 @@ def compute_tempogram(sampling_rate, oenv, hop_length_tempo):
         x_axis="s",
         y_axis="tempo",
     )
-    fig.savefig("data/tempo.png")
-    print("Tempogram saved to " + "data/tempo.png")
+    fig.savefig(CONTENT_ROOT + "data/tempo.png")
+    print("Tempogram saved to " + CONTENT_ROOT + "data/tempo.png")
     return tempogram
 
 
 def segmentation(filename, duration):
+    print(filename)
     """
     @param filename -- абсолютный путь до аудио файла (.ogg)
     @param duration -- продолжительность отрезка аудио в секундах
@@ -79,8 +81,8 @@ def segmentation(filename, duration):
     ax.set_xlabel("Time (s)")
     _ = ax.set(title="Sound envelope")
 
-    fig.savefig("data/sound-envelope.png")
-    print("Sound envelope saved to " + "data/sound-envelope.png")
+    fig.savefig(CONTENT_ROOT + "data/sound-envelope.png")
+    print("Sound envelope saved to " + CONTENT_ROOT + "data/sound-envelope.png")
 
     # Compute the onset strength
     hop_length_tempo = 256
@@ -105,7 +107,7 @@ def segmentation(filename, duration):
     #  например вызывать методы в два этапа или типо того
     # print("Please check out decision.png and choose number of changepoints")
     # n_bkps = int(input())
-    n_bkps = 6
+    n_bkps = 8
     _ = ax.scatter([5], [get_sum_of_cost(algo=algo, n_bkps=5)], color="r", s=100)
 
     # Segmentation
@@ -117,8 +119,8 @@ def segmentation(filename, duration):
     fig, ax = fig_ax()
     _ = librosa.display.specshow(tempogram, ax=ax, x_axis="s", y_axis="tempo", hop_length=hop_length_tempo,
                                  sr=sampling_rate, )
-    fig.savefig("data/result.png")
-    print("Result file saved to " + "data/result.png")
+    fig.savefig(CONTENT_ROOT + "data/result.png")
+    print("Result file saved to " + CONTENT_ROOT + "data/result.png")
 
     for b in bkps_times[:-1]:
         ax.axvline(b, ls="--", color="white", lw=4)
@@ -135,12 +137,16 @@ def segmentation(filename, duration):
         # print(f"Segment n°{segment_number} (duration: {segment.size/sampling_rate:.2f} s)")
         # display(Audio(data=segment, rate=sampling_rate))
 
-    result = np.array(bkps_time_indexes) / sampling_rate
+    result = (np.array(bkps_time_indexes) / sampling_rate)
     print(result)
     return result
 
 
 if __name__ == "__main__":
-    duration = 60  # in seconds
-    filename = '/Users/21415968/Desktop/Nirvana-Smells-like-teen-spirit.ogg'
+    duration = 401 # in seconds
+    filename = CONTENT_ROOT + "MIDIs/1/1.ogg"
+    print(filename)
     result = segmentation(filename, duration)
+    with open(CONTENT_ROOT + 'data/seg-audio-result.txt', 'w') as f:
+        for bound in result:
+            f.write(str(bound) + "\n")
