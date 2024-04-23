@@ -219,7 +219,7 @@ def create_baseline(dataset_name, level, tolerance):
                     f.write(f"\n")
 
     elif dataset_name == "bps":
-        midi_file = Path("C:/Users/Usuario/Documents/Universidad/1 trabajo/BPS-FH/BPS_FH_Dataset")
+        midi_file = Path("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset")
         csv = bps_fh.BPSFH(midi_file).parse_anns(level)
         TIME_SIGS = bps_fh.BPSFH.TIME_SIGS
         valid_files = []

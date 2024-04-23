@@ -3,14 +3,16 @@ from __future__ import print_function
 import msaf
 from config import CONTENT_ROOT
 
+
+
+
+
 def msaf_segmentation(audio_file):
+    """
+    возвращает границы в секундах
+    """
     boundaries, labels = msaf.process(audio_file)
     return boundaries
-
-# 3. Save segments using the MIREX format
-# out_file = '/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/segments.txt'
-# print('Saving output to %s' % out_file)
-# msaf.io.write_mirex(boundaries, labels, out_file)
 
 
 if __name__ == "__main__":

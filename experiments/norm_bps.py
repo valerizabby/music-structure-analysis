@@ -17,7 +17,7 @@ from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-
+#/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/venv/lib/python3.9/site-packages/musicaiz/features/self_similarity.py
 def get_ioi(notes):
     iois = []
     for i, next in zip(notes, notes[1:]):

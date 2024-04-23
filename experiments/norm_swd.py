@@ -7,6 +7,10 @@
 from musicaiz.features.self_similarity import get_segment_boundaries
 from musicaiz.features.rhythm import get_ioi
 from musicaiz.rhythm import TimeSignature
+import numpy as np
+
+import warnings
+warnings.filterwarnings("ignore")
 
 from pathlib import Path
 import sys
@@ -17,6 +21,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+
+
+TIME_SIGS = {
+        "Schubert_D911-01": "2/4", "Schubert_D911-02": "6/8", "Schubert_D911-03": "4/4", "Schubert_D911-04": "4/4",
+        "Schubert_D911-05": "3/4", "Schubert_D911-06": "3/4", "Schubert_D911-07": "2/4", "Schubert_D911-08": "3/4",
+        "Schubert_D911-09": "3/8", "Schubert_D911-10": "2/4", "Schubert_D911-12": "2/4",
+        "Schubert_D911-13": "6/8", "Schubert_D911-14": "3/4", "Schubert_D911-15": "2/4", "Schubert_D911-16": "3/4",
+        "Schubert_D911-17": "12/8", "Schubert_D911-18": "4/4", "Schubert_D911-19": "6/8", "Schubert_D911-20": "2/4",
+        "Schubert_D911-21": "4/4", "Schubert_D911-22": "2/4", "Schubert_D911-23": "3/4", "Schubert_D911-24": "3/4",
+    }
+
+valid_files = list(TIME_SIGS.keys()) # coge los nombres de los archivos
 
 def parse_anns(midis_path, anns_path) -> dict: 
     """Converts the bar index float 
@@ -97,8 +113,10 @@ def get_ioi(notes):
         iois.append(next.start_sec - i.start_sec)
     return iois
 
+
 def get_pitches(notes):
     return [note.pitch for note in notes]
+
 
 def get_local_direction(
     notes,
@@ -118,6 +136,7 @@ def get_local_direction(
         directions.append(direction)
     return directions
 
+
 def znormalization(ts):
     """
     ts - each column of ts is a time series (np.ndarray)
@@ -125,6 +144,7 @@ def znormalization(ts):
     mus = ts.mean(axis = 0)
     stds = ts.std(axis = 0)
     return (ts - mus) / stds
+
 
 def msa_norm(table, tol, alpha1_values, threshold1_values, window2_values, threshold2_values, plot=True):
     precs_alg1, recs_alg1, fscores_alg1 = [], [], []
@@ -252,13 +272,15 @@ def msa_norm(table, tol, alpha1_values, threshold1_values, window2_values, thres
             if i + 1 == len(all_peaks):
                 dists.append(0.0)
                 break
-            d = distance.euclidean(sum(get_ioi(notes_segments[i])), sum(get_ioi(notes_segments[i+1])))
+            d = np.linalg.norm(sum(get_ioi(notes_segments[i])) - sum(get_ioi(notes_segments[i+1])))
+            #d = distance.euclidean(sum(get_ioi(notes_segments[i])), sum(get_ioi(notes_segments[i+1])))
             dists.append(d)
 
         ssm = np.empty((len(notes_segments), len(notes_segments)))
         for i in range(len(notes_segments)):
             for j in range(len(notes_segments)):
-                ssm[i, j] = distance.euclidean(sum(get_ioi(notes_segments[i])), sum(get_ioi(notes_segments[j])))
+                #ssm[i, j] = distance.euclidean(sum(get_ioi(notes_segments[i])), sum(get_ioi(notes_segments[j])))
+                ssm[i, j] = np.linalg.norm(sum(get_ioi(notes_segments[i])) - sum(get_ioi(notes_segments[j])))
         
         try:
             # If threshold is too high that the algorithm does not find peaks try with threshold=0
@@ -309,23 +331,14 @@ def msa_norm(table, tol, alpha1_values, threshold1_values, window2_values, thres
       
     return precs_alg1, recs_alg1, fscores_alg1, precs_alg2, recs_alg2, fscores_alg2
 
+
 from musicaiz.loaders import Musa
 
-dataset = "C:/Users/Usuario/Documents/Universidad/1 trabajo/SWD"
+dataset = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/Schubert_Winterreise_Dataset_v2-0"
 midis_path = Path(dataset, "01_RawData/score_midi")
 anns_path = Path(dataset, "02_Annotations/ann_score_structure")
 table = parse_anns(midis_path, anns_path)
 
-TIME_SIGS = {
-        "Schubert_D911-01": "2/4", "Schubert_D911-02": "6/8", "Schubert_D911-03": "4/4", "Schubert_D911-04": "4/4", 
-        "Schubert_D911-05": "3/4", "Schubert_D911-06": "3/4", "Schubert_D911-07": "2/4", "Schubert_D911-08": "3/4",
-        "Schubert_D911-09": "3/8", "Schubert_D911-10": "2/4", "Schubert_D911-12": "2/4",
-        "Schubert_D911-13": "6/8", "Schubert_D911-14": "3/4", "Schubert_D911-15": "2/4", "Schubert_D911-16": "3/4",
-        "Schubert_D911-17": "12/8", "Schubert_D911-18": "4/4", "Schubert_D911-19": "6/8", "Schubert_D911-20": "2/4",
-        "Schubert_D911-21": "4/4", "Schubert_D911-22": "2/4", "Schubert_D911-23": "3/4", "Schubert_D911-24": "3/4",
-    }
-
-valid_files = list(TIME_SIGS.keys()) # coge los nombres de los archivos
 
 tolerance = ["1_beat", "1_bar"]
 
@@ -412,6 +425,10 @@ for tol in tolerance:
     baseline_recs_std = recs_alg_base.std()
     baseline_fscores_std = fscores_alg_base.std()
 
+    print(baseline_precs)
+    print(baseline_recs)
+    print(baseline_fscores)
+
     precisions = np.concatenate(([baseline_precs], precisions))
     recalls = np.concatenate(([baseline_recs], recalls))
     fscores = np.concatenate(([baseline_fscores], fscores))
@@ -421,7 +438,7 @@ for tol in tolerance:
     fscores_std = np.concatenate(([baseline_fscores_std], fscores_std))
 
     with open(f"norm_{dataset_name}_{level}.txt", 'a') as f:
-
+            print(len(precisions))
             for i in range(len(precisions)):
                 if i == 0:
                     f.write(f"------ RESULTS FOR BASELINE for tolerance {tolerance} ----------\n")
@@ -431,6 +448,7 @@ for tol in tolerance:
                     f.write(f"\n")
 
                 else:
+                    print(precisions_alg1_mean)
                     f.write(f"------ RESULTS FOR alpha1 = {alpha1_values}, threshold1 = {threshold1_values}, window2 = {window2_values}, threshold2 = {threshold2_values} and tolerance {tolerance} ----------\n")
                     f.write(f"P: {precisions_alg1_mean[i-1]} +/- {precisions_alg1_std[i-1]}\n")
                     f.write(f"R: {recalls_alg1_mean[i-1]} +/- {recalls_alg1_std[i-1]}\n")

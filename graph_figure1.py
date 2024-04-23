@@ -17,7 +17,11 @@ from musicaiz.features import PeltArgs
 from musicaiz.features import LevelsBPS
 from musicaiz.features import StructurePrediction
 from musicaiz.datasets.bps_fh import BPSFH
+
+
 warnings.filterwarnings("ignore")
+
+from utils.graph_figure_utils import get_boundaries, get_labels
 
 from config import CONTENT_ROOT
 
@@ -39,26 +43,8 @@ DIRECTORY_FOR_FIGURE = "app/static/Image"
 # отрисовать MIDI (fluidsynth) и положить в audio (???)!!
 
 
-def get_boundaries(csv, filename):
-    ref = np.empty((len(csv[filename])),
-                   dtype=int)  # crear una matriz 17x2, igual que el tamaño de la matriz csv[filename]
-    for idx, row in enumerate(csv[filename].iterrows()):  # recorre la matriz csv[filename]
-        ref[idx] = row[1][1]
-    ref = np.insert(ref, 0, 0)
-    return ref
-
-
-def get_labels(csv, filename):
-    ref = np.empty((len(csv[filename])),
-                   dtype="S10")
-    for idx, row in enumerate(csv[filename].iterrows()):
-        ref[idx] = row[1][2]
-    return ref
-
-
 
 def make_graph_figure(path_string):
-
     file = Path(path_string)
     filename = file.stem
 
@@ -81,6 +67,7 @@ def make_graph_figure(path_string):
 
     g = musa_to_graph(musa_obj)
     mat = nx.attr_matrix(g)[0]
+    # TODO тут в get_segment_boundaries надо вернуть секунды
     n = get_novelty_func(mat)
     nn = np.reshape(n, (n.size, 1))
 
@@ -108,7 +95,7 @@ def make_graph_figure(path_string):
     # )
     result_high = sp.beats(level="high", dataset="BPS")
 
-    #result_high = sp.beats(pelt_args)
+    # result_high = sp.beats(pelt_args)
 
     # predict mid
 
@@ -120,7 +107,7 @@ def make_graph_figure(path_string):
     minsize = alpha * (len(musa_obj.notes) / 15)
     jump = int(round(beta * minsize))
     penalty = 0.5
-    #pelt_args = LevelsBPS.MID
+    # pelt_args = LevelsBPS.MID
     pelt_args = PeltArgs(
         penalty=penalty,
         alpha=alpha,
@@ -134,7 +121,7 @@ def make_graph_figure(path_string):
     #     # jump=jump,  # 20
     # )
 
-    #result_mid = sp.beats(pelt_args)
+    # result_mid = sp.beats(pelt_args)
     result_mid = sp.beats(level="mid", dataset="BPS")
 
     # predict low
@@ -147,7 +134,7 @@ def make_graph_figure(path_string):
     minsize = alpha * (len(musa_obj.notes) / 15)
     jump = int(round(beta * minsize))
     penalty = 2
-    #pelt_args = LevelsBPS.LOW
+    # pelt_args = LevelsBPS.LOW
     pelt_args = PeltArgs(
         penalty=penalty,
         alpha=alpha,
@@ -162,16 +149,13 @@ def make_graph_figure(path_string):
     # )
 
     result_low = sp.beats(level="low", dataset="BPS")
-    #result_low = sp.beats(pelt_args)
+    # result_low = sp.beats(pelt_args)
 
     log.info("Making picture...")
 
-    #labels = ("test", "test", "test", "test", "test", "test","test","test", "test")
-
     fig, axes = plt.subplots(
         nrows=9, ncols=1, figsize=(25, 18), dpi=300,
-        gridspec_kw={'height_ratios': [61, 8, 5, 8, 5, 8, 5, 5, 6]})
-
+        gridspec_kw={'height_ratios': [61, 8, 5, 8, 5, 8, 5, 5, 5]})
 
     ax1 = axes[0]
     ax2 = axes[1]
@@ -192,15 +176,6 @@ def make_graph_figure(path_string):
     ax7.set_xlabel("ruptures")
     ax8.set_xlabel("msaf")
 
-    # plt.ylabel('msaf', axes=ax1)
-    # plt.ylabel('ruptures', axes=ax2)
-    # plt.ylabel('high', axes=ax3)
-    # plt.ylabel('gt', axes=ax4)
-    # plt.ylabel('mid', axes=ax5)
-    # plt.ylabel('gt', axes=ax6)
-    # plt.ylabel('low', axes=ax7)
-    # plt.ylabel('gt', axes=ax8)
-
     pos_high, pos_mid, pos_low = [], [], []
     for i in range(len(ref_high)):
         pos = len([note for note in musa_obj.notes if note.start_ticks <= musa_obj.beats[ref_high[i]].start_ticks])
@@ -214,7 +189,8 @@ def make_graph_figure(path_string):
         pos = len([note for note in musa_obj.notes if note.start_ticks <= musa_obj.beats[ref_low[i]].start_ticks])
         pos_low.append(pos)
         # ax1.axvline(pos, color='#bcbcbc', linestyle="-", alpha=.5)
-
+    # TODO
+    print(pos_mid)
     ax1.plot(range(nn.shape[0]), n)
 
     # ground truth high
@@ -234,7 +210,7 @@ def make_graph_figure(path_string):
         res = len([note for note in musa_obj.notes if note.start_ticks <= musa_obj.beats[result_high[p]].start_ticks])
         ax3.axvline(res, color='#f48383', linestyle="-", alpha=1)
 
-    # ground truth mid
+    # ground truth mid TODO достать отсюда секунды
     for p, i in enumerate(pos_mid):
         if p % 2 == 0:
             color = '#7f9fbc'
@@ -271,14 +247,14 @@ def make_graph_figure(path_string):
     # мои audio предикты
     # TODO сделать нормальный флоу! читать эту инфу из файла
 
-    for p in np.array(parse_result("data/seg-audio-result.txt")) * (2156/401):
+    for p in np.array(parse_result("data/seg-audio-result.txt")) * (2156 / 401):
         ax8.axvline(p, color='#0000FF', linestyle="-", alpha=1)
     # for p in [213.41987253, 441.94580218, 729.21057356,
     #                        958.48556385, 1106.30020505, 1518.65811027,
     #                        1796.74688833, 2023.40016627, 2156.04632862]:
     #     ax8.axvline(p, color='#0000FF', linestyle="-", alpha=1)
 
-    for p in np.array(parse_result("data/seg-audio-msaf-result.txt")) * (2156/401):
+    for p in np.array(parse_result("data/seg-audio-msaf-result.txt")) * (2156 / 401):
         ax9.axvline(p, color='#006400', linestyle="-", alpha=1)
 
     ax1.set_xticks([])
@@ -317,6 +293,5 @@ def make_graph_figure(path_string):
 
 
 if __name__ == '__main__':
-    #make_graph_figure('app/data/upload_files_from_localhost/soldat.mid')
+    # make_graph_figure('app/data/upload_files_from_localhost/soldat.mid')
     make_graph_figure('MIDIs/1/1.mid')
-
