@@ -21,15 +21,16 @@ def get_gt_boundaries(path_string: str):
     file = Path(path_string)
     filename = file.stem
 
-    print(filename)
+    #print(filename)
 
     csv_mid = data.parse_anns(anns="mid")
 
     musa_obj = Musa(file)
-    print(csv_mid, filename)
+    #print(csv_mid, filename)
     ref_mid = get_boundaries(csv_mid, filename)
 
     pos_mid = []
+
     for i in range(len(ref_mid)):
         pos = len([note for note in musa_obj.notes if note.start_ticks <= musa_obj.beats[ref_mid[i]].start_ticks])
         pos_mid.append(pos)
@@ -40,7 +41,7 @@ if __name__ == "__main__":
 # TODO для каждого файла из бпс датасета сделать txt файл с boundary GT
 ## TODO перевести эту хрень в секунды
     boundaries = get_gt_boundaries('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1.mid')
-
+    #print(boundaries)
     # with open(CONTENT_ROOT + 'BPS_FH_Dataset/1/1-gt-mid.txt', 'w') as f:
     #     for bound in boundaries:
     #         f.write(str(bound) + "\n")
