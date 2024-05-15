@@ -121,8 +121,13 @@ def make_graph_figure(path_string):
     #     # jump=jump,  # 20
     # )
 
+    # TODO тут сейчас будет научное открытие
+
     # result_mid = sp.beats(pelt_args)
+    result_mid_in_ms = sp.beats(level="mid", dataset="BPS")
     result_mid = sp.beats(level="mid", dataset="BPS")
+
+    print(result_mid_in_ms)
 
     # predict low
 

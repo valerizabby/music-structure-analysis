@@ -4,6 +4,15 @@ import numpy as np
 from config import CONTENT_ROOT
 
 
+def parse_gt_txt(filename):
+    """парсит txt файлы где через перенос строки числа записыны"""
+    data = []
+    with open(filename) as f:
+        for line in f:
+            data.append([float(x) for x in line.split()][0])
+    return data
+
+
 def parse_result(filename) -> list:
     # тут костыль: читаем без последнего элемента, потому что там ''
     audio_file = os.path.join(CONTENT_ROOT, filename)
@@ -13,4 +22,4 @@ def parse_result(filename) -> list:
 
 
 if __name__ == "__main__":
-    res = parse_result('data/seg-audio-result.txt')
+    print(parse_gt_txt("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/10/10_gt_mid.txt"))
