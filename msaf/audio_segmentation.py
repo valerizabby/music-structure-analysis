@@ -1,10 +1,7 @@
-# Simple MSAF example
 from __future__ import print_function
 import msaf
-from config import CONTENT_ROOT
-
-
-
+from predict_mid_structure import f1_score
+from utils.parse_result import parse_gt_txt
 
 
 def msaf_segmentation(audio_file):
@@ -16,9 +13,7 @@ def msaf_segmentation(audio_file):
 
 
 if __name__ == "__main__":
-    audio_file = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/MIDIs/1/1.mp3"
+    audio_file = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1.mp3"
     boundaries = msaf_segmentation(audio_file)
-
-    with open(CONTENT_ROOT + 'data/seg-audio-msaf-result.txt', 'w') as f:
-        for bound in boundaries:
-            f.write(str(bound) + "\n")
+    gt = parse_gt_txt("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1_gt_mid.txt")
+    print(f1_score(gt, boundaries))
