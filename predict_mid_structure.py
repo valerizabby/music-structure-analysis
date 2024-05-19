@@ -16,6 +16,8 @@ from musicaiz.datasets.bps_fh import BPSFH
 from config import CONTENT_ROOT
 from utils.graph_figure_utils import get_boundaries, get_labels
 from ruptures.metrics import precision_recall
+from utils.get_BPS_filenames import get_all_BPS_dataset_filenames
+
 
 warnings.filterwarnings("ignore")
 log.basicConfig(level=logging.INFO)
@@ -141,6 +143,15 @@ def make_graph_figure(path_string):
 
 
 if __name__ == '__main__':
-    result = make_graph_figure('MIDIs/1/1.mid')
-    print(result)
-    print(f1_score(result["GT"], result["PREDICTED"], 5))
+    # result = make_graph_figure('MIDIs/1/1.mid')
+    # print(result)
+    # print(f1_score(result["GT"], result["PREDICTED"], 5))
+    # запустили symbolic алгоритм на всех файлах
+    filename_to_absolute_file = get_all_BPS_dataset_filenames()
+    for filename in filename_to_absolute_file:
+        if filename != '7':
+            log.info(f"Working with {filename_to_absolute_file[filename]}")
+            current_prediction_in_secs = make_graph_figure(filename_to_absolute_file[filename])['PREDICTED']
+            with open(CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename + "_symbolic_pred.txt", 'w') as f:
+                for bound in current_prediction_in_secs:
+                    f.write(str(bound) + "\n")

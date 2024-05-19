@@ -1,7 +1,17 @@
 from __future__ import print_function
 import msaf
+from msaf.input_output import FileStruct
+
 from predict_mid_structure import f1_score
+from utils.get_BPS_filenames import get_all_BPS_dataset_filenames
 from utils.parse_result import parse_gt_txt
+from msaf.algorithms.foote import Segmenter
+import logging as log
+import logging
+
+log.basicConfig(level=logging.INFO)
+
+CONTENT_ROOT = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/"
 
 
 def msaf_segmentation(audio_file):
@@ -13,7 +23,19 @@ def msaf_segmentation(audio_file):
 
 
 if __name__ == "__main__":
-    audio_file = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1.mp3"
-    boundaries = msaf_segmentation(audio_file)
-    gt = parse_gt_txt("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1_gt_mid.txt")
-    print(f1_score(gt, boundaries))
+    # TODO пофиксить ошибку WARNING:root:Audio file too short, or too many few beats estimated. Returning empty estimations.
+    audio_file = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/23/23.mp3"
+    # boundaries = msaf_segmentation(audio_file)
+    boundaries, labels = msaf.process(audio_file, boundaries_id="foote", labels_id="cnmf")
+    print(boundaries)
+# if __name__ == "__main__":
+#     # тут код достает гт разметку для всех файлов BPS
+#     filename_to_absolute_file = get_all_BPS_dataset_filenames(".mp3")
+#     for filename in filename_to_absolute_file:
+#         if filename != '7':
+#             log.info(f"Working with {filename_to_absolute_file[filename]}")
+#             current_boundaries = msaf_segmentation(filename_to_absolute_file[filename])
+#             with open(CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename + "_msaf_pred.txt", 'w') as f:
+#                 for bound in current_boundaries:
+#                     f.write(str(bound) + "\n")
+

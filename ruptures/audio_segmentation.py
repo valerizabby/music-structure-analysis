@@ -3,6 +3,8 @@ import librosa
 import numpy as np
 import os
 
+from pretty_midi import pretty_midi
+
 from config import CONTENT_ROOT
 import ruptures as rpt
 
@@ -39,7 +41,7 @@ def plot_decision_graph(algo, array_of_n_bkps):
     ax.set_title("Sum of costs")
     ax.grid(axis="x")
     ax.set_xlim(0, n_bkps_max + 1)
-    fig.savefig('data/decision.png')
+    fig.savefig('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/decision.png')
     print("Pic saved to data/decision.png")
 
 
@@ -144,9 +146,9 @@ def segmentation(filename, duration):
 
 if __name__ == "__main__":
     duration = 401 # in seconds
-    filename = CONTENT_ROOT + "MIDIs/1/1.ogg"
-    print(filename)
-    result = segmentation(filename, duration)
+    filename = '/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/MIDIs/958.ogg'
+    # midi_data = pretty_midi.PrettyMIDI(filename[:-4] + ".mid")
+    result = segmentation(filename, duration=40)
     with open(CONTENT_ROOT + 'data/seg-audio-result.txt', 'w') as f:
         for bound in result:
             f.write(str(bound) + "\n")

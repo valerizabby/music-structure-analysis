@@ -4,9 +4,11 @@ from mir_eval.segment import detection
 from pathlib import Path
 from musicaiz.datasets.bps_fh import BPSFH
 from pathlib import Path
-import glob
+
+
 
 from predict_mid_structure import array_of_notes_to_end_sec
+from utils.get_BPS_filenames import get_all_BPS_dataset_filenames
 from utils.graph_figure_utils import get_boundaries
 from musicaiz.loaders import Musa
 
@@ -43,18 +45,6 @@ def get_gt_boundaries(path_string: str):
     return sec_mid_predicted
 
 
-def get_all_BPS_dataset_filenames():
-    files_in_dataset_directory = glob.glob("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/*", recursive=True)
-    # list_of_midi_files = []
-    filename_to_absolute_file = {}
-    for directory in files_in_dataset_directory:
-        if '.' not in directory:
-            filename = Path(directory).stem
-            filename_wo_extention = CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename
-            midi_path = filename_wo_extention + ".mid"
-            # list_of_midi_files.append(midi_path)
-            filename_to_absolute_file[filename] = midi_path
-    return filename_to_absolute_file
 
 
 if __name__ == "__main__":

@@ -1,0 +1,54 @@
+{
+  "annotations": [
+    {
+      "annotation_metadata": {
+        "curator": {
+          "name": "",
+          "email": ""
+        },
+        "annotator": {},
+        "version": "0.1.80",
+        "corpus": "",
+        "annotation_tools": "",
+        "annotation_rules": "",
+        "validation": "",
+        "data_source": "MSAF"
+      },
+      "namespace": "segment_open",
+      "data": [
+        {
+          "time": 0.0,
+          "duration": 349.0046258503401,
+          "value": "A",
+          "confidence": null
+        }
+      ],
+      "sandbox": {
+        "boundaries_id": "sf",
+        "labels_id": null,
+        "timestamp": "2024/05/18 22:39:37",
+        "annot_beats": false,
+        "feature": "pcp",
+        "framesync": false,
+        "M_gaussian": 27,
+        "m_embedded": 3,
+        "k_nearest": 0.04,
+        "Mp_adaptive": 28,
+        "offset_thres": 0.05,
+        "bound_norm_feats": Infinity,
+        "hier": false
+      },
+      "time": 0,
+      "duration": null
+    }
+  ],
+  "file_metadata": {
+    "title": "",
+    "artist": "",
+    "release": "",
+    "duration": 349.0046258503401,
+    "identifiers": {},
+    "jams_version": "0.3.4"
+  },
+  "sandbox": {}
+}
