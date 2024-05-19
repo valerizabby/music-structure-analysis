@@ -1,5 +1,6 @@
 from __future__ import print_function
 import msaf
+from mir_eval.alignment import absolute_error
 from msaf.input_output import FileStruct
 
 from predict_mid_structure import f1_score

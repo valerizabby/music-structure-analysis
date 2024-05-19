@@ -1,14 +1,20 @@
 import matplotlib.pyplot as plt
 import librosa
 import numpy as np
-import os
+
+import logging as log
+
+from utils.parse_result import parse_gt_txt
+
+log.basicConfig(level=log.INFO)
 
 from pretty_midi import pretty_midi
 
-from config import CONTENT_ROOT
 import ruptures as rpt
 
 # Choose the number of changes (elbow heuristic)
+from utils.get_BPS_filenames import get_all_BPS_dataset_filenames, construct_filename_with_your_extention
+
 n_bkps_max = 20  # K_max
 
 
@@ -23,7 +29,7 @@ def get_sum_of_cost(algo, n_bkps):
     return algo.cost.sum_of_costs(bkps)
 
 
-def plot_decision_graph(algo, array_of_n_bkps):
+def plot_decision_graph(algo, array_of_n_bkps, path_to_save):
     """
     Строит график, по которому принимается решение о количестве changepoint-ов
     @param algo -- алгоритм
@@ -41,8 +47,8 @@ def plot_decision_graph(algo, array_of_n_bkps):
     ax.set_title("Sum of costs")
     ax.grid(axis="x")
     ax.set_xlim(0, n_bkps_max + 1)
-    fig.savefig('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/decision.png')
-    print("Pic saved to data/decision.png")
+    fig.savefig(path_to_save)
+    log.info(f"Elbow decision graph saved to {path_to_save}")
 
 
 def compute_tempogram(sampling_rate, oenv, hop_length_tempo):
@@ -52,41 +58,32 @@ def compute_tempogram(sampling_rate, oenv, hop_length_tempo):
         sr=sampling_rate,
         hop_length=hop_length_tempo,
     )
-    # Display the tempogram
-    fig, ax = fig_ax()
-    _ = librosa.display.specshow(
-        tempogram,
-        ax=ax,
-        hop_length=hop_length_tempo,
-        sr=sampling_rate,
-        x_axis="s",
-        y_axis="tempo",
-    )
-    fig.savefig(CONTENT_ROOT + "data/tempo.png")
-    print("Tempogram saved to " + CONTENT_ROOT + "data/tempo.png")
+    log.info("Tempogram computed")
+    # # Display the tempogram
+    # fig, ax = fig_ax()
+    # _ = librosa.display.specshow(
+    #     tempogram,
+    #     ax=ax,
+    #     hop_length=hop_length_tempo,
+    #     sr=sampling_rate,
+    #     x_axis="s",
+    #     y_axis="tempo",
+    # )
+    # fig.savefig(CONTENT_ROOT + "data/tempo.png")
+    # print("Tempogram saved to " + CONTENT_ROOT + "data/tempo.png")
+
     return tempogram
 
 
-def segmentation(filename, duration):
+def segmentation(filename, duration, n_bkps=8):
     print(filename)
     """
     @param filename -- абсолютный путь до аудио файла (.ogg)
     @param duration -- продолжительность отрезка аудио в секундах
+    @param n_bkps -- количество changepoint-ов
     """
 
     signal, sampling_rate = librosa.load(filename, duration=duration)
-
-    # look at the envelope
-    fig, ax = fig_ax()
-    ax.plot(np.arange(signal.size) / sampling_rate, signal)
-    ax.set_xlim(0, signal.size / sampling_rate)
-    ax.set_xlabel("Time (s)")
-    _ = ax.set(title="Sound envelope")
-
-    fig.savefig(CONTENT_ROOT + "data/sound-envelope.png")
-    print("Sound envelope saved to " + CONTENT_ROOT + "data/sound-envelope.png")
-
-    # Compute the onset strength
     hop_length_tempo = 256
     oenv = librosa.onset.onset_strength(
         y=signal, sr=sampling_rate, hop_length=hop_length_tempo
@@ -97,47 +94,29 @@ def segmentation(filename, duration):
     algo = rpt.KernelCPD(kernel="linear").fit(tempogram.T)
 
     # Start by computing the segmentation with most changes.
-    # After start, all segmentations with 1, 2,..., K_max-1 changes are also available for free.
     _ = algo.predict(n_bkps_max)
 
     array_of_n_bkps = np.arange(1, n_bkps_max + 1)
 
-    plot_decision_graph(algo, array_of_n_bkps)
+    plot_decision_graph(algo, array_of_n_bkps, construct_filename_with_your_extention(filename, "_elbow_graph.png"))
 
-    # Visually we choose n_bkps=5 (highlighted in red on the elbow plot)
-    # TODO придумать как тут раскумекать с количеством changepoint-ов
-    #  например вызывать методы в два этапа или типо того
-    # print("Please check out decision.png and choose number of changepoints")
-    # n_bkps = int(input())
-    n_bkps = 8
-    _ = ax.scatter([5], [get_sum_of_cost(algo=algo, n_bkps=5)], color="r", s=100)
+    # TODO как считать количество changepoint-ов inplace?
+    # _ = ax.scatter([5], [get_sum_of_cost(algo=algo, n_bkps=5)], color="r", s=100)
 
     # Segmentation
     bkps = algo.predict(n_bkps=n_bkps)
     # Convert the estimated change points (frame counts) to actual timestamps
     bkps_times = librosa.frames_to_time(bkps, sr=sampling_rate, hop_length=hop_length_tempo)
 
-    # Displaying results
-    fig, ax = fig_ax()
-    _ = librosa.display.specshow(tempogram, ax=ax, x_axis="s", y_axis="tempo", hop_length=hop_length_tempo,
-                                 sr=sampling_rate, )
-    fig.savefig(CONTENT_ROOT + "data/result.png")
-    print("Result file saved to " + CONTENT_ROOT + "data/result.png")
-
-    for b in bkps_times[:-1]:
-        ax.axvline(b, ls="--", color="white", lw=4)
+    # for b in bkps_times[:-1]:
+    #     ax.axvline(b, ls="--", color="white", lw=4)
 
     # Compute change points corresponding indexes in original signal
     bkps_time_indexes = (sampling_rate * bkps_times).astype(int).tolist()
 
-    for segment_number, (start, end) in enumerate(
-            rpt.utils.pairwise([0] + bkps_time_indexes), start=1
-    ):
-        segment = signal[start:end]
-        # ВРЕМЯ В СЕКУНДАХ
-        print("Start", round(start / sampling_rate, 3), "end", round(end / sampling_rate, 3))
-        # print(f"Segment n°{segment_number} (duration: {segment.size/sampling_rate:.2f} s)")
-        # display(Audio(data=segment, rate=sampling_rate))
+    # for segment_number, (start, end) in enumerate(rpt.utils.pairwise([0] + bkps_time_indexes), start=1):
+    #     # ВРЕМЯ В СЕКУНДАХ
+    #     print("Start", round(start / sampling_rate, 3), "end", round(end / sampling_rate, 3))
 
     result = (np.array(bkps_time_indexes) / sampling_rate)
     print(result)
@@ -145,10 +124,16 @@ def segmentation(filename, duration):
 
 
 if __name__ == "__main__":
-    duration = 401 # in seconds
-    filename = '/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/MIDIs/958.ogg'
-    # midi_data = pretty_midi.PrettyMIDI(filename[:-4] + ".mid")
-    result = segmentation(filename, duration=40)
-    with open(CONTENT_ROOT + 'data/seg-audio-result.txt', 'w') as f:
-        for bound in result:
-            f.write(str(bound) + "\n")
+    count = 0
+    filename_to_absolute_file = get_all_BPS_dataset_filenames('.ogg')
+    for filename in filename_to_absolute_file:
+        if filename != '7':
+            name = filename_to_absolute_file[filename]
+            duration = pretty_midi.PrettyMIDI(construct_filename_with_your_extention(name, ".mid")).get_end_time()
+            # # TODO узнаем количество точек разбиения из gt, как без этого?
+            n_bkps = len(parse_gt_txt(construct_filename_with_your_extention(name, "_gt_mid.txt")))
+            log.info(f"Working with {name}")
+            current_prediction_in_secs = segmentation(name, duration=duration, n_bkps=n_bkps)
+            with open(construct_filename_with_your_extention(name, "_ruptures_pred.txt"), 'w') as f:
+                for bound in current_prediction_in_secs:
+                    f.write(str(bound) + "\n")

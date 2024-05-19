@@ -17,3 +17,14 @@ def get_all_BPS_dataset_filenames(extention=".mid"):
             # list_of_midi_files.append(midi_path)
             filename_to_absolute_file[filename] = midi_path
     return filename_to_absolute_file
+
+
+def construct_filename_with_your_extention(filename, ext):
+    """
+    Params:
+    filename -- абсолютный путь до файла
+    ext -- конец файла вида "_kek.ogg"
+    """
+    parent_name = Path(filename).parent
+    name = Path(filename).stem
+    return f"{parent_name}/{name}{ext}"

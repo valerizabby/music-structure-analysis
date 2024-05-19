@@ -5,7 +5,7 @@ from config import CONTENT_ROOT
 
 
 def parse_gt_txt(filename):
-    """парсит txt файлы где через перенос строки числа записыны"""
+    """парсит txt файлы где через перенос строки числа записаны"""
     data = []
     with open(filename) as f:
         for line in f:
