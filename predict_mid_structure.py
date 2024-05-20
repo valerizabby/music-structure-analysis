@@ -14,10 +14,12 @@ from musicaiz.features import (
 from musicaiz.features import StructurePrediction
 from musicaiz.datasets.bps_fh import BPSFH
 from config import CONTENT_ROOT
-from utils.graph_figure_utils import get_boundaries, get_labels
+from models.utils.graph_figure_utils import get_boundaries, get_labels
 from ruptures.metrics import precision_recall
-from utils.get_BPS_filenames import get_all_BPS_dataset_filenames
+from models.utils.filename_utils import get_all_BPS_dataset_filenames
+import pandas as pd
 
+from models.utils.parse_result import parse_gt_txt
 
 warnings.filterwarnings("ignore")
 log.basicConfig(level=logging.INFO)
@@ -25,7 +27,8 @@ log.basicConfig(level=logging.INFO)
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 matplotlib.use('agg')
 
-dataset = "BPS_FH_Dataset"
+# dataset = "BPS_FH_Dataset"
+dataset = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset"
 DIRECTORY_FOR_FIGURE = "app/static/Image"
 
 
@@ -75,16 +78,18 @@ def make_graph_figure(path_string):
     log.info("Making picture...")
 
     fig, axes = plt.subplots(
-        nrows=3, ncols=1, figsize=(25, 18), dpi=300,
-        gridspec_kw={'height_ratios': [61, 8, 8]})
+        nrows=4, ncols=1, figsize=(20, 9), dpi=300,
+        gridspec_kw={'height_ratios': [60, 8, 8, 8]})
 
     ax1 = axes[0]
     ax2 = axes[1]
     ax3 = axes[2]
+    ax4 = axes[3]
 
-    ax1.set_xlabel("gt")
-    ax2.set_xlabel("mid")
-    ax3.set_xlabel("gt")
+    ax1.set_xlabel("novelty curve")
+    ax2.set_xlabel("mid gt")
+    ax3.set_xlabel("pred")
+    ax4.set_xlabel("ruptures")
 
     pos_mid = []
     sec_mid_predicted = []
@@ -94,12 +99,12 @@ def make_graph_figure(path_string):
         # Note(start_sec=1.500000, end_sec=2.000000, start_ticks=288, end_ticks=384)
         # берем start_sec первой ноты и end_sec последней (?) на самом деле для каждого массива берем последнюю
         if i == 0:
-            sec_mid_predicted.append(0)
+            sec_mid_ground_truth.append(0)
         else:
             array_of_notes = [note for note in musa_obj.notes if note.start_ticks <= musa_obj.beats[ref_mid[i]].start_ticks]
             pos = len(array_of_notes)
 
-            sec_mid_predicted.append(array_of_notes_to_end_sec(array_of_notes))
+            sec_mid_ground_truth.append(array_of_notes_to_end_sec(array_of_notes))
             pos_mid.append(pos)
 
     ax1.plot(range(nn.shape[0]), n)
@@ -116,25 +121,33 @@ def make_graph_figure(path_string):
             ax2.axvspan(pos_mid[p], pos_mid[p + 1], facecolor=color, alpha=0.5)
 
     # predicted mid
+    pred_mid = []
     for p, i in enumerate(result_mid):
         if (p == 0):
-            sec_mid_ground_truth.append(0)
+            sec_mid_predicted.append(0)
         else:
             array_of_notes = [note for note in musa_obj.notes if note.start_ticks <= musa_obj.beats[result_mid[p]].start_ticks]
 
-            sec_mid_ground_truth.append(array_of_notes_to_end_sec(array_of_notes))
+            sec_mid_predicted.append(array_of_notes_to_end_sec(array_of_notes))
             res = len(array_of_notes)
+            pred_mid.append(res)
             ax3.axvline(res, color='#f48383', linestyle="-", alpha=1)
+
+    for p, i in enumerate(np.array(parse_gt_txt('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/13/13_ruptures_pred.txt')) * 10.6):
+        ax4.axvline(i, color='#f48383', linestyle="-", alpha=1)
 
     ax1.set_xticks([])
     ax2.set_xticks([])
     ax2.set_yticks([])
     ax3.set_xticks([])
     ax3.set_yticks([])
+    ax4.set_xticks([])
+    ax4.set_yticks([])
 
     ax1.margins(x=0)
     ax2.margins(x=0)
     ax3.margins(x=0)
+    ax4.margins(x=0)
 
     result_dir = CONTENT_ROOT + DIRECTORY_FOR_FIGURE + "/" + filename + "-figure" + ".png"
     log.info("Saving pic into " + result_dir)
@@ -143,15 +156,16 @@ def make_graph_figure(path_string):
 
 
 if __name__ == '__main__':
-    # result = make_graph_figure('MIDIs/1/1.mid')
+    result = make_graph_figure('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/13/13.mid')
+
     # print(result)
     # print(f1_score(result["GT"], result["PREDICTED"], 5))
     # запустили symbolic алгоритм на всех файлах
-    filename_to_absolute_file = get_all_BPS_dataset_filenames()
-    for filename in filename_to_absolute_file:
-        if filename != '7':
-            log.info(f"Working with {filename_to_absolute_file[filename]}")
-            current_prediction_in_secs = make_graph_figure(filename_to_absolute_file[filename])['PREDICTED']
-            with open(CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename + "_symbolic_pred.txt", 'w') as f:
-                for bound in current_prediction_in_secs:
-                    f.write(str(bound) + "\n")
+    # filename_to_absolute_file = get_all_BPS_dataset_filenames()
+    # for filename in filename_to_absolute_file:
+    #     if filename != '7':
+    #         log.info(f"Working with {filename_to_absolute_file[filename]}")
+    #         current_prediction_in_secs = make_graph_figure(filename_to_absolute_file[filename])['PREDICTED']
+    #         with open(CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename + "_symbolic_pred.txt", 'w') as f:
+    #             for bound in current_prediction_in_secs:
+    #                 f.write(str(bound) + "\n")

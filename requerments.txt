@@ -4,3 +4,4 @@ librosa==0.10.1
 ipython==8.20.0
 midi2audio==0.1.1
 msaf==0.1.80
+pandas==2.2.2
