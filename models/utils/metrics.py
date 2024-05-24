@@ -1,10 +1,10 @@
 from musicaiz.datasets.bps_fh import BPSFH
 from pathlib import Path
 
-from models.utils.filename_utils import get_all_BPS_dataset_filenames
-from models.utils.graph_figure_utils import get_boundaries
+from models.utils.dataparser import make_set_file_to_absolute_path
+from models.symbolic_domain.utils.graph_figure_utils import get_boundaries
 from musicaiz.loaders import Musa
-from config import CONTENT_ROOT, dataset
+from config import CONTENT_ROOT, dataset, BPS_absolute_path
 
 data = BPSFH(dataset)
 
@@ -48,7 +48,7 @@ def get_gt_boundaries(path_string: str):
 
 if __name__ == "__main__":
     # тут код достает гт разметку для всех файлов BPS
-    filename_to_absolute_file = get_all_BPS_dataset_filenames()
+    filename_to_absolute_file = make_set_file_to_absolute_path(BPS_absolute_path, "mid")
     for filename in filename_to_absolute_file:
         if filename != '7':
             print(CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename + "_gt_mid.txt")

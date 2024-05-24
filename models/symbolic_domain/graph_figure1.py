@@ -7,7 +7,6 @@ import warnings
 import numpy as np
 import networkx as nx
 from pathlib import Path
-from models.utils.parse_result import parse_result
 
 from musicaiz.loaders import Musa
 from musicaiz.features import (
@@ -21,7 +20,7 @@ from musicaiz.datasets.bps_fh import BPSFH
 
 warnings.filterwarnings("ignore")
 
-from models.utils.graph_figure_utils import get_boundaries, get_labels
+from models.symbolic_domain.utils.graph_figure_utils import get_boundaries, get_labels
 
 from config import CONTENT_ROOT
 
@@ -244,15 +243,15 @@ def make_graph_figure(path_string):
     # мои audio предикты
     # TODO сделать нормальный флоу! читать эту инфу из файла
 
-    for p in np.array(parse_result("../../data/seg-audio-result.txt")) * (2156 / 401):
-        ax8.axvline(p, color='#0000FF', linestyle="-", alpha=1)
-    # for p in [213.41987253, 441.94580218, 729.21057356,
-    #                        958.48556385, 1106.30020505, 1518.65811027,
-    #                        1796.74688833, 2023.40016627, 2156.04632862]:
+    # for p in np.array(parse_result("../../data/seg-audio-result.txt")) * (2156 / 401):
     #     ax8.axvline(p, color='#0000FF', linestyle="-", alpha=1)
-
-    for p in np.array(parse_result("../../data/seg-audio-msaf-result.txt")) * (2156 / 401):
-        ax9.axvline(p, color='#006400', linestyle="-", alpha=1)
+    # # for p in [213.41987253, 441.94580218, 729.21057356,
+    # #                        958.48556385, 1106.30020505, 1518.65811027,
+    # #                        1796.74688833, 2023.40016627, 2156.04632862]:
+    # #     ax8.axvline(p, color='#0000FF', linestyle="-", alpha=1)
+    #
+    # for p in np.array(parse_result("../../data/seg-audio-msaf-result.txt")) * (2156 / 401):
+    #     ax9.axvline(p, color='#006400', linestyle="-", alpha=1)
 
     ax1.set_xticks([])
     ax2.set_xticks([])

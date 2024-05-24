@@ -4,7 +4,9 @@ import numpy as np
 
 import logging as log
 
-from models.utils.parse_result import parse_gt_txt
+from config import BPS_absolute_path
+from models.utils.dataparser import get_all_files_in_directory, make_set_file_to_absolute_path
+from models.utils.dataparser import parse_txt
 
 log.basicConfig(level=log.INFO)
 
@@ -13,7 +15,7 @@ from pretty_midi import pretty_midi
 import ruptures as rpt
 
 # Choose the number of changes (elbow heuristic)
-from models.utils.filename_utils import get_all_BPS_dataset_filenames, construct_filename_with_your_extention
+from models.utils.dataparser import construct_filename_with_your_extension
 
 n_bkps_max = 20  # K_max
 
@@ -75,7 +77,7 @@ def compute_tempogram(sampling_rate, oenv, hop_length_tempo):
     return tempogram
 
 
-def segmentation(filename, duration, n_bkps=8):
+def segmentation(filename, duration, n_bkps=8, algo_type="pelt"):
     print(filename)
     """
     @param filename -- абсолютный путь до аудио файла (.ogg)
@@ -90,21 +92,33 @@ def segmentation(filename, duration, n_bkps=8):
     )
 
     tempogram = compute_tempogram(sampling_rate, oenv, hop_length_tempo)
-    # TODO а в symbolic используется это!!!!
-    # algo = rpt.Pelt(
-    #                 model="rbf",
-    #                 min_size=pelt_args.alpha*(len(self.midi_object.notes)/15),
-    #                 jump=int(pelt_args.betha*pelt_args.alpha*(len(self.midi_object.notes)/15)),
-    #             ).fit(nn)
-    #             result = algo.predict(pen=pelt_args.penalty)
+
+    # g = musa_to_graph(self.midi_object)
+    #     mat = nx.attr_matrix(g)[0]
+    #     n = get_novelty_func(mat)
+    #     nn = np.reshape(n, (n.size, 1))
+    #     # detection
+    #     try:
+    #         algo = rpt.Pelt(
+    #             model="rbf",
+    #             min_size=pelt_args.alpha*(len(self.midi_object.notes)/15),
+    #             jump=int(pelt_args.betha*pelt_args.alpha*(len(self.midi_object.notes)/15)),
+    #         ).fit(nn)
+    #         result = algo.predict(pen=pelt_args.penalty)
+    #     except:
+    #         warnings.warn("No structure found.")
+    #         result = [0, len(self.midi_object.notes)-1]
 
     # Choose detection method
-    algo = rpt.KernelCPD(kernel="linear").fit(tempogram.T)
+    if algo_type == "kernel":
+        algo = rpt.KernelCPD(kernel="linear").fit(tempogram.T)
+    if algo_type == "pelt":
+        algo = rpt.Pelt(model="rbf").fit(tempogram.T)
 
     # Start by computing the segmentation with most changes.
     _ = algo.predict(n_bkps_max)
     array_of_n_bkps = np.arange(1, n_bkps_max + 1)
-    plot_decision_graph(algo, array_of_n_bkps, construct_filename_with_your_extention(filename, "_elbow_graph.png"))
+    plot_decision_graph(algo, array_of_n_bkps, construct_filename_with_your_extension(filename, "_elbow_graph.png"))
 
     # TODO как считать количество changepoint-ов inplace?
     # _ = ax.scatter([5], [get_sum_of_cost(algo=algo, n_bkps=5)], color="r", s=100)
@@ -114,32 +128,29 @@ def segmentation(filename, duration, n_bkps=8):
     # Convert the estimated change points (frame counts) to actual timestamps
     bkps_times = librosa.frames_to_time(bkps, sr=sampling_rate, hop_length=hop_length_tempo)
 
-    # for b in bkps_times[:-1]:
-    #     ax.axvline(b, ls="--", color="white", lw=4)
-
     # Compute change points corresponding indexes in original signal
     bkps_time_indexes = (sampling_rate * bkps_times).astype(int).tolist()
-
-    # for segment_number, (start, end) in enumerate(rpt.utils.pairwise([0] + bkps_time_indexes), start=1):
-    #     # ВРЕМЯ В СЕКУНДАХ
-    #     print("Start", round(start / sampling_rate, 3), "end", round(end / sampling_rate, 3))
 
     result = (np.array(bkps_time_indexes) / sampling_rate)
     print(result)
     return result
 
 
+
+
+
 if __name__ == "__main__":
     count = 0
-    filename_to_absolute_file = get_all_BPS_dataset_filenames('.ogg')
+    filename_to_absolute_file = make_set_file_to_absolute_path(BPS_absolute_path, "ogg")
+
     for filename in filename_to_absolute_file:
         if filename != '7':
             name = filename_to_absolute_file[filename]
-            duration = pretty_midi.PrettyMIDI(construct_filename_with_your_extention(name, ".mid")).get_end_time()
+            duration = pretty_midi.PrettyMIDI(construct_filename_with_your_extension(name, ".mid")).get_end_time()
             # # TODO узнаем количество точек разбиения из gt, как без этого?
-            n_bkps = len(parse_gt_txt(construct_filename_with_your_extention(name, "_gt_mid.txt")))
+            n_bkps = len(parse_txt(construct_filename_with_your_extension(name, "_gt_mid.txt")))
             log.info(f"Working with {name}")
             current_prediction_in_secs = segmentation(name, duration=duration, n_bkps=n_bkps)
-            with open(construct_filename_with_your_extention(name, "_ruptures_pred.txt"), 'w') as f:
+            with open(construct_filename_with_your_extension(name, "_ruptures_pred.txt"), 'w') as f:
                 for bound in current_prediction_in_secs:
                     f.write(str(bound) + "\n")

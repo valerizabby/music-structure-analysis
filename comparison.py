@@ -1,15 +1,13 @@
 from config import CONTENT_ROOT
-from models.utils.filename_utils import get_all_BPS_dataset_filenames, construct_filename_with_your_extention
-from models.utils.parse_result import parse_gt_txt
-from predict_mid_structure import f1_score
+from models.utils.dataparser import parse_txt
 from ruptures.metrics import meantime
 import logging as log
 import numpy as np
 
 from mir_eval.alignment import percentage_correct
 
-
 log.basicConfig(level=log.INFO)
+
 
 def meantime_custom(gt, pred, M=10):
     # фиктивно приравниваем последние элементы
@@ -21,15 +19,18 @@ def meantime_custom(gt, pred, M=10):
     return meantime(gt, pred)
 
 
-
 if __name__ == "__main__":
     filename_gt = f"{CONTENT_ROOT}BPS_FH_Dataset/15/15_gt_mid.txt"
     filename_rup = f"{CONTENT_ROOT}BPS_FH_Dataset/15/15_ruptures_pred.txt"
     filename_symb = f"{CONTENT_ROOT}BPS_FH_Dataset/15/15_symbolic_pred.txt"
 
-    gt = parse_gt_txt(filename_gt)
-    data1 = parse_gt_txt(filename_symb)
-    data2 = parse_gt_txt(filename_rup)
+    gt = parse_txt(filename_gt, )
+    data1 = parse_txt(filename_symb)
+    data2 = parse_txt(filename_rup)
+
+    print(len(gt))
+    print(len(data1))
+    print(len(data2))
 
     print(data2)
 
