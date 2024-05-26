@@ -7,8 +7,12 @@ from models.Segmenter import Segmenter
 
 
 class AudioPelt(Segmenter):
-    def __init__(self, algo_type):
+    def __init__(self, algo_type, n_bkps_from_gt):
+        # algo types: pelt, kernel
         self.algo_type = algo_type
+        # n_bkps_from_gt: True, если берем данные из разметкм
+        # False, если дефолтное
+        self.n_bkps_from_gt = n_bkps_from_gt
 
     def predict(self, input_file):
         duration = pretty_midi.PrettyMIDI(construct_filename_with_your_extension(input_file, ".mid")).get_end_time()
@@ -18,4 +22,5 @@ class AudioPelt(Segmenter):
 
 
 if __name__ == "__main__":
-    AudioPelt(algo_type='pelt').predict("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1.mp3")
+    model = AudioPelt(algo_type='pelt', n_bkps_from_gt=True)
+    print(model.predict("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1.mp3"))

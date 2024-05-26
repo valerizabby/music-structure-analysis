@@ -27,6 +27,7 @@ def fig_ax(figsize=(15, 5), dpi=150):
 
 def get_sum_of_cost(algo, n_bkps):
     """Return the sum of costs for the change points `bkps`"""
+    # todo
     bkps = algo.predict(n_bkps=n_bkps)
     return algo.cost.sum_of_costs(bkps)
 
@@ -77,7 +78,7 @@ def compute_tempogram(sampling_rate, oenv, hop_length_tempo):
     return tempogram
 
 
-def segmentation(filename, duration, n_bkps=8, algo_type="pelt"):
+def segmentation(filename, duration, n_bkps_hard=8, algo_type="pelt", n_bkps_from_gt=True):
     print(filename)
     """
     @param filename -- абсолютный путь до аудио файла (.ogg)
@@ -93,64 +94,43 @@ def segmentation(filename, duration, n_bkps=8, algo_type="pelt"):
 
     tempogram = compute_tempogram(sampling_rate, oenv, hop_length_tempo)
 
-    # g = musa_to_graph(self.midi_object)
-    #     mat = nx.attr_matrix(g)[0]
-    #     n = get_novelty_func(mat)
-    #     nn = np.reshape(n, (n.size, 1))
-    #     # detection
-    #     try:
-    #         algo = rpt.Pelt(
-    #             model="rbf",
-    #             min_size=pelt_args.alpha*(len(self.midi_object.notes)/15),
-    #             jump=int(pelt_args.betha*pelt_args.alpha*(len(self.midi_object.notes)/15)),
-    #         ).fit(nn)
-    #         result = algo.predict(pen=pelt_args.penalty)
-    #     except:
-    #         warnings.warn("No structure found.")
-    #         result = [0, len(self.midi_object.notes)-1]
+
+    # Segmentation
+    if n_bkps_from_gt:
+        n_bkps = len(construct_filename_with_your_extension(filename, "_gt_mid.txt"))
+    else:
+        n_bkps = n_bkps_hard
 
     # Choose detection method
     if algo_type == "kernel":
         algo = rpt.KernelCPD(kernel="linear").fit(tempogram.T)
+        bkps = algo.predict(n_bkps=n_bkps)
+
     if algo_type == "pelt":
         algo = rpt.Pelt(model="rbf").fit(tempogram.T)
+        # TODO какой тут пеналти ставить
+        bkps = algo.predict(pen=50)
 
-    # Start by computing the segmentation with most changes.
-    _ = algo.predict(n_bkps_max)
-    array_of_n_bkps = np.arange(1, n_bkps_max + 1)
-    plot_decision_graph(algo, array_of_n_bkps, construct_filename_with_your_extension(filename, "_elbow_graph.png"))
-
-    # TODO как считать количество changepoint-ов inplace?
-    # _ = ax.scatter([5], [get_sum_of_cost(algo=algo, n_bkps=5)], color="r", s=100)
-
-    # Segmentation
-    bkps = algo.predict(n_bkps=n_bkps)
     # Convert the estimated change points (frame counts) to actual timestamps
     bkps_times = librosa.frames_to_time(bkps, sr=sampling_rate, hop_length=hop_length_tempo)
-
     # Compute change points corresponding indexes in original signal
     bkps_time_indexes = (sampling_rate * bkps_times).astype(int).tolist()
-
     result = (np.array(bkps_time_indexes) / sampling_rate)
     print(result)
+
     return result
 
 
-
-
-
 if __name__ == "__main__":
-    count = 0
     filename_to_absolute_file = make_set_file_to_absolute_path(BPS_absolute_path, "ogg")
-
     for filename in filename_to_absolute_file:
         if filename != '7':
             name = filename_to_absolute_file[filename]
             duration = pretty_midi.PrettyMIDI(construct_filename_with_your_extension(name, ".mid")).get_end_time()
             # # TODO узнаем количество точек разбиения из gt, как без этого?
-            n_bkps = len(parse_txt(construct_filename_with_your_extension(name, "_gt_mid.txt")))
+            # n_bkps = len(parse_txt(construct_filename_with_your_extension(name, "_gt_mid.txt")))
             log.info(f"Working with {name}")
-            current_prediction_in_secs = segmentation(name, duration=duration, n_bkps=n_bkps)
-            with open(construct_filename_with_your_extension(name, "_ruptures_pred.txt"), 'w') as f:
+            current_prediction_in_secs = segmentation(name, duration=duration, n_bkps_hard=11, algo_type="kernel", n_bkps_from_gt=False)
+            with open(construct_filename_with_your_extension(name, "_ruptures_pred_11.txt"), 'w') as f:
                 for bound in current_prediction_in_secs:
                     f.write(str(bound) + "\n")

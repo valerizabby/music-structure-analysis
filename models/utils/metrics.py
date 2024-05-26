@@ -1,6 +1,8 @@
 from musicaiz.datasets.bps_fh import BPSFH
 from pathlib import Path
 
+from ruptures.metrics import precision_recall
+
 from models.utils.dataparser import make_set_file_to_absolute_path
 from models.symbolic_domain.utils.graph_figure_utils import get_boundaries
 from musicaiz.loaders import Musa
@@ -44,6 +46,18 @@ def get_gt_boundaries(path_string: str):
             pos_mid.append(pos)
 
     return sec_mid_predicted
+
+    def f1_score(gt, pred, M=10):
+        # фиктивно приравниваем последние элементы
+        # The end of the last regime is not the same for each of the partitions
+        if (gt[-1] > pred[-1]):
+            pred[-1] = gt[-1]
+        else:
+            gt[-1] = pred[-1]
+
+        precision, recall = precision_recall(gt, pred, margin=M)
+        return 2 * precision * recall / (precision + recall)
+
 
 
 if __name__ == "__main__":
