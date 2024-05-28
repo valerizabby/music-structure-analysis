@@ -45,8 +45,8 @@ if __name__ == "__main__":
     audio_11_scores = []
 
     for filename in filename_to_absolute_file:
-        if filename != '7' and filename != '15':
-            # log.info(f"Working with {filename_to_absolute_file[filename]}")
+        if filename != '15':
+            log.info(f"Working with {filename_to_absolute_file[filename]}")
             current_file = filename_to_absolute_file[filename]
 
             construct_filename_with_your_extension(current_file, ".ogg")
