@@ -3,8 +3,8 @@ from pathlib import Path
 
 from ruptures.metrics import precision_recall
 
-from models.utils.dataparser import make_set_file_to_absolute_path
-from models.symbolic_domain.utils.graph_figure_utils import get_boundaries
+from SMSA.utils.dataparser import make_set_file_to_absolute_path
+from SMSA.symbolic_domain.utils.graph_figure_utils import get_boundaries
 from musicaiz.loaders import Musa
 from config import CONTENT_ROOT, dataset, BPS_absolute_path
 

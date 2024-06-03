@@ -9,7 +9,7 @@ import logging as log
 log.basicConfig(level=log.INFO)
 
 from config import BPS_absolute_path
-from models.utils.dataparser import make_set_file_to_absolute_path, construct_filename_with_your_extension
+from SMSA.utils.dataparser import make_set_file_to_absolute_path, construct_filename_with_your_extension
 
 
 def gt(dataset):

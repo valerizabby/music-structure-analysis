@@ -14,8 +14,8 @@ from musicaiz.features import (
 from musicaiz.features import StructurePrediction
 from musicaiz.datasets.bps_fh import BPSFH
 from config import CONTENT_ROOT
-from models.utils.dataparser import parse_txt
-from models.symbolic_domain.utils.graph_figure_utils import get_boundaries, get_labels
+from SMSA.utils.dataparser import parse_txt
+from SMSA.symbolic_domain.utils.graph_figure_utils import get_boundaries, get_labels
 from ruptures.metrics import precision_recall
 
 

@@ -1,4 +1,4 @@
-from figure_ssm import make_ssm_figure
+from SMSA.utils.figure_ssm import make_ssm_figure
 from graph_figure1 import make_graph_figure
 
 

@@ -5,8 +5,8 @@ from pathlib import Path
 from musicaiz.features import StructurePrediction
 import numpy as np
 from config import BPS_absolute_path
-from models.Segmenter import Segmenter
-from models.utils.dataparser import make_set_file_to_absolute_path, construct_filename_with_your_extension
+from SMSA.Segmenter import Segmenter
+from SMSA.utils.dataparser import make_set_file_to_absolute_path, construct_filename_with_your_extension
 
 warnings.filterwarnings("ignore")
 log.basicConfig(level=log.INFO)
@@ -23,7 +23,6 @@ class SymbolicPelt(Segmenter):
         Params:
             input_file -- абсолютный путь до MIDI файла
         Return:
-            
         """
         file = Path(input_file)
         log.info(f"Predicting mid structure for file {input_file}")
@@ -33,13 +32,14 @@ class SymbolicPelt(Segmenter):
 
 
 if __name__ == "__main__":
-    # print(SymbolicPelt().predict("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/7/7.mid"))
+    # print(SymbolicPelt().predict("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1.mid"))
     filename_to_absolute_file = make_set_file_to_absolute_path(BPS_absolute_path, "mid")
     for filename in filename_to_absolute_file:
         name = filename_to_absolute_file[filename]
         log.info(f"Working with {name}")
         current_prediction_in_secs = SymbolicPelt().predict(name)
-        with open(construct_filename_with_your_extension(name, "_symbolic_pred.txt"), 'w') as f:
-            for bound in current_prediction_in_secs:
-                f.write(str(bound) + "\n")
+        print(current_prediction_in_secs)
+    #     with open(construct_filename_with_your_extension(name, "_symbolic_pred.txt"), 'w') as f:
+    #         for bound in current_prediction_in_secs:
+    #             f.write(str(bound) + "\n")
 

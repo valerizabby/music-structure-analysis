@@ -1,12 +1,17 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import librosa
 import numpy as np
 
 import logging as log
 
+from musicaiz import LevelsBPS
+from musicaiz.loaders import Musa
+
 from config import BPS_absolute_path
-from models.utils.dataparser import get_all_files_in_directory, make_set_file_to_absolute_path
-from models.utils.dataparser import parse_txt
+from SMSA.utils.dataparser import get_all_files_in_directory, make_set_file_to_absolute_path
+from SMSA.utils.dataparser import parse_txt
 
 log.basicConfig(level=log.INFO)
 
@@ -15,7 +20,7 @@ from pretty_midi import pretty_midi
 import ruptures as rpt
 
 # Choose the number of changes (elbow heuristic)
-from models.utils.dataparser import construct_filename_with_your_extension
+from SMSA.utils.dataparser import construct_filename_with_your_extension
 
 n_bkps_max = 20  # K_max
 
@@ -55,27 +60,47 @@ def plot_decision_graph(algo, array_of_n_bkps, path_to_save):
 
 
 def compute_tempogram(sampling_rate, oenv, hop_length_tempo):
-    # Compute the tempogram
     tempogram = librosa.feature.tempogram(
         onset_envelope=oenv,
         sr=sampling_rate,
         hop_length=hop_length_tempo,
     )
     log.info("Tempogram computed")
-    # # Display the tempogram
-    # fig, ax = fig_ax()
-    # _ = librosa.display.specshow(
-    #     tempogram,
-    #     ax=ax,
-    #     hop_length=hop_length_tempo,
-    #     sr=sampling_rate,
-    #     x_axis="s",
-    #     y_axis="tempo",
-    # )
-    # fig.savefig(CONTENT_ROOT + "data/tempo.png")
-    # print("Tempogram saved to " + CONTENT_ROOT + "data/tempo.png")
-
     return tempogram
+
+
+def kernel(filename, tempogram, n_bkps_from_gt, n_bkps_hard):
+
+    # Segmentation
+    if n_bkps_from_gt:
+        n_bkps = len(parse_txt(construct_filename_with_your_extension(filename, "_gt_mid.txt")))
+    else:
+        n_bkps = n_bkps_hard
+
+    log.info(f"Using kernel algo to compute segmentation")
+    algo = rpt.KernelCPD(kernel="linear").fit(tempogram.T)
+    log.info("Kernel fitted to tempo")
+    bkps = algo.predict(n_bkps=n_bkps)
+    return bkps
+
+
+def pelt(filename, tempogram):
+
+    log.info(f"Using pelt algo to compute segmentation")
+    midi_object = Musa(file=Path(construct_filename_with_your_extension(filename, ".mid")))
+    pelt_args = LevelsBPS.MID.value
+    # log.info(f"min_size: {pelt_args.alpha * (len(midi_object.notes))}")
+    # log.info(f"jump: {int(pelt_args.betha * pelt_args.alpha * (len(midi_object.notes)))}")
+    algo = rpt.Pelt(
+        model="rbf",
+        min_size=10000,
+        jump=100,
+    ).fit(tempogram.T)
+    # algo = rpt.Pelt(model="rbf").fit(tempogram.T)
+    log.info("Pelt fitted to tempo")
+    # TODO какой тут пеналти ставить
+    bkps = algo.predict(pen=pelt_args.penalty)
+    return bkps
 
 
 def segmentation(filename, duration, n_bkps_hard=8, algo_type="pelt", n_bkps_from_gt=True):
@@ -88,34 +113,16 @@ def segmentation(filename, duration, n_bkps_hard=8, algo_type="pelt", n_bkps_fro
 
     signal, sampling_rate = librosa.load(filename, duration=duration)
     hop_length_tempo = 256
-    oenv = librosa.onset.onset_strength(
-        y=signal, sr=sampling_rate, hop_length=hop_length_tempo
-    )
+    oenv = librosa.onset.onset_strength(y=signal, sr=sampling_rate, hop_length=hop_length_tempo)
 
     tempogram = compute_tempogram(sampling_rate, oenv, hop_length_tempo)
 
-
-    # Segmentation
-    if n_bkps_from_gt:
-        n_bkps = len(parse_txt(construct_filename_with_your_extension(filename, "_gt_mid.txt")))
-    else:
-        n_bkps = n_bkps_hard
-
     # Choose detection method
     if algo_type == "kernel":
-        algo = rpt.KernelCPD(kernel="linear").fit(tempogram.T)
-        bkps = algo.predict(n_bkps=n_bkps)
+        bkps = kernel(filename, tempogram, n_bkps_from_gt, n_bkps_hard)
 
     if algo_type == "pelt":
-        # algo = rpt.Pelt(
-        #                 model="rbf",
-        #                 min_size=pelt_args.alpha*(len(self.midi_object.notes)/15),
-        #                 jump=int(pelt_args.betha*pelt_args.alpha*(len(self.midi_object.notes)/15)),
-        #             ).fit(nn)
-        #             result = algo.predict(pen=pelt_args.penalty)
-        algo = rpt.Pelt(model="rbf").fit(tempogram.T)
-        # TODO какой тут пеналти ставить
-        bkps = algo.predict(pen=0.5)
+        bkps = pelt(filename, tempogram)
 
     # Convert the estimated change points (frame counts) to actual timestamps
     bkps_times = librosa.frames_to_time(bkps, sr=sampling_rate, hop_length=hop_length_tempo)
@@ -123,17 +130,18 @@ def segmentation(filename, duration, n_bkps_hard=8, algo_type="pelt", n_bkps_fro
     bkps_time_indexes = (sampling_rate * bkps_times).astype(int).tolist()
     result = (np.array(bkps_time_indexes) / sampling_rate)
     print(result)
-
     return result
 
 
 if __name__ == "__main__":
     name = '/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/7/7.ogg'
     duration = pretty_midi.PrettyMIDI(construct_filename_with_your_extension(name, ".mid")).get_end_time()
-    current_prediction_in_secs = segmentation(name, duration=duration, algo_type="kernel", n_bkps_from_gt=True)
-    with open(construct_filename_with_your_extension(name, "_ruptures_pred.txt"), 'w') as f:
-        for bound in current_prediction_in_secs:
-            f.write(str(bound) + "\n")
+    current_prediction_in_secs = segmentation(name, duration=duration, algo_type="pelt")
+    print(current_prediction_in_secs)
+
+    # with open(construct_filename_with_your_extension(name, "_ruptures_pred.txt"), 'w') as f:
+    #     for bound in current_prediction_in_secs:
+    #         f.write(str(bound) + "\n")
     # filename_to_absolute_file = make_set_file_to_absolute_path(BPS_absolute_path, "ogg")
     # for filename in filename_to_absolute_file:
     #     if filename != '7':

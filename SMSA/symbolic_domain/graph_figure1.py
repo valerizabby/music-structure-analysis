@@ -20,7 +20,7 @@ from musicaiz.datasets.bps_fh import BPSFH
 
 warnings.filterwarnings("ignore")
 
-from models.symbolic_domain.utils.graph_figure_utils import get_boundaries, get_labels
+from SMSA.symbolic_domain.utils.graph_figure_utils import get_boundaries, get_labels
 
 from config import CONTENT_ROOT
 

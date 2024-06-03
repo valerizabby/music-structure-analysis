@@ -1,9 +1,9 @@
 from pretty_midi import pretty_midi
-from models.audio_domain.ruptures.audio_segmentation import segmentation
+from SMSA.audio_domain.ruptures.audio_segmentation import segmentation
 
-from models.utils.dataparser import construct_filename_with_your_extension
+from SMSA.utils.dataparser import construct_filename_with_your_extension
 
-from models.Segmenter import Segmenter
+from SMSA.Segmenter import Segmenter
 
 
 class AudioPelt(Segmenter):

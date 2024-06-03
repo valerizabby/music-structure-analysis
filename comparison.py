@@ -1,5 +1,5 @@
 from config import CONTENT_ROOT, BPS_absolute_path
-from models.utils.dataparser import parse_txt, construct_filename_with_your_extension, make_set_file_to_absolute_path
+from SMSA.utils.dataparser import parse_txt, construct_filename_with_your_extension, make_set_file_to_absolute_path
 from ruptures.metrics import meantime
 import logging as log
 import numpy as np
