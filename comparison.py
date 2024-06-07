@@ -43,6 +43,7 @@ if __name__ == "__main__":
     symbolic_scores = []
     audio_scores = []
     audio_11_scores = []
+    lens = []
 
     for filename in filename_to_absolute_file:
         if filename != '15':
@@ -57,6 +58,9 @@ if __name__ == "__main__":
             ruptures_11_path = construct_filename_with_your_extension(current_file, "_ruptures_pred_11.txt")
 
             gt = parse_txt(gt_path)
+
+            l = len(gt)
+
             symb = parse_txt(symbolic_path)
             rupt = parse_txt(ruptures_path)
             rupt11 = parse_txt(ruptures_11_path)
@@ -65,9 +69,11 @@ if __name__ == "__main__":
             f1_audio = f1_score(rupt, gt, M=5)
             f1_audio_11 = f1_score(rupt11, gt, M=5)
 
+
+
             # log.info(f"symb: {f1_symb}")
             # log.info(f"pelt: {f1_audio}")
-
+            lens.append(l)
             symbolic_scores.append(f1_symb)
             audio_scores.append(f1_audio)
             audio_11_scores.append(f1_audio_11)
@@ -75,3 +81,4 @@ if __name__ == "__main__":
     print(f"Символьная структура: {np.mean(np.array(symbolic_scores))}")
     print(f"Аудио changepoint из gt {np.mean(np.array(audio_scores))}")
     print(f"Аудио changepoint 11 {np.mean(np.array(audio_11_scores))}")
+    print(f"Среднее число границ {np.mean(np.array(lens))}")

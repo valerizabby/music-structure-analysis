@@ -18,6 +18,9 @@ class SymbolicPelt(Segmenter):
     def __init__(self):
         pass
 
+    def fit(self):
+        pass
+
     def predict(self, input_file):
         """
         Params:

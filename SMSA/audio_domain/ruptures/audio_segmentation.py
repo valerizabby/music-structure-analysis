@@ -1,6 +1,4 @@
 from pathlib import Path
-
-import matplotlib.pyplot as plt
 import librosa
 import numpy as np
 
@@ -9,9 +7,9 @@ import logging as log
 from musicaiz import LevelsBPS
 from musicaiz.loaders import Musa
 
-from config import BPS_absolute_path
-from SMSA.utils.dataparser import get_all_files_in_directory, make_set_file_to_absolute_path
+from SMSA.audio_domain.utils import compute_tempogram
 from SMSA.utils.dataparser import parse_txt
+from config import hop_length_tempo, min_size, jump
 
 log.basicConfig(level=log.INFO)
 
@@ -22,57 +20,12 @@ import ruptures as rpt
 # Choose the number of changes (elbow heuristic)
 from SMSA.utils.dataparser import construct_filename_with_your_extension
 
-n_bkps_max = 20  # K_max
 
 
-def fig_ax(figsize=(15, 5), dpi=150):
-    """Return a (matplotlib) figure and ax objects with given size."""
-    return plt.subplots(figsize=figsize, dpi=dpi)
-
-
-def get_sum_of_cost(algo, n_bkps):
-    """Return the sum of costs for the change points `bkps`"""
-    # todo
-    bkps = algo.predict(n_bkps=n_bkps)
-    return algo.cost.sum_of_costs(bkps)
-
-
-def plot_decision_graph(algo, array_of_n_bkps, path_to_save):
-    """
-    Строит график, по которому принимается решение о количестве changepoint-ов
-    @param algo -- алгоритм
-    @param array_of_n_bkps) --
-    """
-    fig, ax = fig_ax((7, 4))
-    ax.plot(
-        array_of_n_bkps,
-        [get_sum_of_cost(algo=algo, n_bkps=n_bkps) for n_bkps in array_of_n_bkps],
-        "-*",
-        alpha=0.5,
-    )
-    ax.set_xticks(array_of_n_bkps)
-    ax.set_xlabel("Number of change points")
-    ax.set_title("Sum of costs")
-    ax.grid(axis="x")
-    ax.set_xlim(0, n_bkps_max + 1)
-    fig.savefig(path_to_save)
-    log.info(f"Elbow decision graph saved to {path_to_save}")
-
-
-def compute_tempogram(sampling_rate, oenv, hop_length_tempo):
-    tempogram = librosa.feature.tempogram(
-        onset_envelope=oenv,
-        sr=sampling_rate,
-        hop_length=hop_length_tempo,
-    )
-    log.info("Tempogram computed")
-    return tempogram
-
-
-def kernel(filename, tempogram, n_bkps_from_gt, n_bkps_hard):
+def kernel(filename, tempogram, mode, n_bkps_hard):
 
     # Segmentation
-    if n_bkps_from_gt:
+    if mode == "gt":
         n_bkps = len(parse_txt(construct_filename_with_your_extension(filename, "_gt_mid.txt")))
     else:
         n_bkps = n_bkps_hard
@@ -87,23 +40,24 @@ def kernel(filename, tempogram, n_bkps_from_gt, n_bkps_hard):
 def pelt(filename, tempogram):
 
     log.info(f"Using pelt algo to compute segmentation")
-    midi_object = Musa(file=Path(construct_filename_with_your_extension(filename, ".mid")))
+    # midi_object = Musa(file=Path(construct_filename_with_your_extension(filename, ".mid")))
     pelt_args = LevelsBPS.MID.value
     # log.info(f"min_size: {pelt_args.alpha * (len(midi_object.notes))}")
     # log.info(f"jump: {int(pelt_args.betha * pelt_args.alpha * (len(midi_object.notes)))}")
+
     algo = rpt.Pelt(
         model="rbf",
-        min_size=10000,
-        jump=100,
+        min_size=min_size,
+        jump=jump,
     ).fit(tempogram.T)
+
     # algo = rpt.Pelt(model="rbf").fit(tempogram.T)
     log.info("Pelt fitted to tempo")
-    # TODO какой тут пеналти ставить
     bkps = algo.predict(pen=pelt_args.penalty)
     return bkps
 
 
-def segmentation(filename, duration, n_bkps_hard=8, algo_type="pelt", n_bkps_from_gt=True):
+def segmentation(filename, duration, n_bkps_hard=8, algo="pelt", mode="gt"):
     print(filename)
     """
     @param filename -- абсолютный путь до аудио файла (.ogg)
@@ -112,16 +66,16 @@ def segmentation(filename, duration, n_bkps_hard=8, algo_type="pelt", n_bkps_fro
     """
 
     signal, sampling_rate = librosa.load(filename, duration=duration)
-    hop_length_tempo = 256
+
     oenv = librosa.onset.onset_strength(y=signal, sr=sampling_rate, hop_length=hop_length_tempo)
 
     tempogram = compute_tempogram(sampling_rate, oenv, hop_length_tempo)
 
     # Choose detection method
-    if algo_type == "kernel":
-        bkps = kernel(filename, tempogram, n_bkps_from_gt, n_bkps_hard)
+    if algo == "kernel":
+        bkps = kernel(filename, tempogram, mode, n_bkps_hard)
 
-    if algo_type == "pelt":
+    if algo == "pelt":
         bkps = pelt(filename, tempogram)
 
     # Convert the estimated change points (frame counts) to actual timestamps
