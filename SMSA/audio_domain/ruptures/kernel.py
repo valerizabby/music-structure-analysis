@@ -1,9 +1,9 @@
 from SMSA.audio_domain.AudioPeltInterface import AudioPeltInterface
 import ruptures as rpt
-from SMSA.utils.dataparser import construct_filename_with_your_extension
+from SMSA.Dataparser import construct_filename_with_your_extension
 import logging as log
 from SMSA.audio_domain.ruptures.utils.tempogram import tempo, bkps2sec
-from SMSA.utils.dataparser import parse_txt
+from SMSA.Dataparser import parse_txt
 
 log.basicConfig(level=log.INFO)
 

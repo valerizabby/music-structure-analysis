@@ -14,7 +14,7 @@ from musicaiz.features import (
 from musicaiz.features import StructurePrediction
 from musicaiz.datasets.bps_fh import BPSFH
 from config import CONTENT_ROOT
-from SMSA.utils.dataparser import parse_txt
+from SMSA.Dataparser import parse_txt
 from SMSA.symbolic_domain.utils.graph_figure_utils import get_boundaries, get_labels
 from ruptures.metrics import precision_recall
 
@@ -28,18 +28,6 @@ matplotlib.use('agg')
 # dataset = "BPS_FH_Dataset"
 dataset = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/BPS_FH_Dataset"
 DIRECTORY_FOR_FIGURE = "app/static/Image"
-
-
-def f1_score(gt, pred, M=10):
-    # фиктивно приравниваем последние элементы
-    # The end of the last regime is not the same for each of the partitions
-    if (gt[-1] > pred[-1]):
-        pred[-1] = gt[-1]
-    else:
-        gt[-1] = pred[-1]
-
-    precision, recall = precision_recall(gt, pred, margin=M)
-    return 2 * precision * recall / (precision + recall)
 
 
 def array_of_notes_to_end_sec(array_of_notes):
@@ -152,18 +140,3 @@ def make_graph_figure(path_string):
     plt.savefig(result_dir, dpi=300, bbox_inches='tight', pad_inches=0, transparent=False)
     return {"GT": sec_mid_ground_truth, "PREDICTED": sec_mid_predicted}
 
-
-if __name__ == '__main__':
-    result = make_graph_figure('/data/BPS_FH_Dataset/13/13.mid')
-
-    # print(result)
-    # print(f1_score(result["GT"], result["PREDICTED"], 5))
-    # запустили symbolic алгоритм на всех файлах
-    # filename_to_absolute_file = get_all_BPS_dataset_filenames()
-    # for filename in filename_to_absolute_file:
-    #     if filename != '7':
-    #         log.info(f"Working with {filename_to_absolute_file[filename]}")
-    #         current_prediction_in_secs = make_graph_figure(filename_to_absolute_file[filename])['PREDICTED']
-    #         with open(CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename + "_symbolic_pred.txt", 'w') as f:
-    #             for bound in current_prediction_in_secs:
-    #                 f.write(str(bound) + "\n")

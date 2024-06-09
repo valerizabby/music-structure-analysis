@@ -1,6 +1,6 @@
 from pretty_midi import pretty_midi
 
-from SMSA.utils.dataparser import construct_filename_with_your_extension
+from SMSA.Dataparser import construct_filename_with_your_extension
 
 
 def dur(filename):

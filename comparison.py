@@ -1,10 +1,10 @@
-from config import CONTENT_ROOT, BPS_absolute_path, RUSSIAN_POP_ABSOLUTE_PATH
-from SMSA.utils.dataparser import parse_txt, construct_filename_with_your_extension, make_set_file_to_absolute_path
+from config import BPS_absolute_path, RUSSIAN_POP_ABSOLUTE_PATH
+from SMSA.Dataparser import parse_txt, construct_filename_with_your_extension, make_set_file_to_absolute_path
 from ruptures.metrics import meantime
 import logging as log
 import numpy as np
 
-from predict_mid_structure import f1_score
+from SMSA.utils.metrics import f1_score
 
 log.basicConfig(level=log.INFO)
 

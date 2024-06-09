@@ -3,13 +3,12 @@ from pathlib import Path
 
 import numpy as np
 from musicaiz import BPSFH
-from pretty_midi import pretty_midi
 import logging as log
 
 log.basicConfig(level=log.INFO)
 
 from config import BPS_absolute_path
-from SMSA.utils.dataparser import make_set_file_to_absolute_path, construct_filename_with_your_extension
+from SMSA.Dataparser import make_set_file_to_absolute_path
 
 
 def gt(dataset):

@@ -4,9 +4,8 @@ import warnings
 from pathlib import Path
 from musicaiz.features import StructurePrediction
 import numpy as np
-from config import BPS_absolute_path
 from SMSA.Segmenter import Segmenter
-from SMSA.utils.dataparser import make_set_file_to_absolute_path, construct_filename_with_your_extension
+from SMSA.Dataparser import construct_filename_with_your_extension
 
 warnings.filterwarnings("ignore")
 log.basicConfig(level=log.INFO)

@@ -1,6 +1,5 @@
 from SMSA.audio_domain.AudioPelt import AudioPelt
-from SMSA.symbolic_domain.SymbolicPelt import SymbolicPelt
-from SMSA.utils.dataparser import make_set_file_to_absolute_path, construct_filename_with_your_extension
+from SMSA.Dataparser import make_set_file_to_absolute_path, construct_filename_with_your_extension
 from config import RUSSIAN_POP_ABSOLUTE_PATH
 import logging as log
 
