@@ -26,7 +26,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 matplotlib.use('agg')
 
 # dataset = "BPS_FH_Dataset"
-dataset = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset"
+dataset = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/BPS_FH_Dataset"
 DIRECTORY_FOR_FIGURE = "app/static/Image"
 
 
@@ -131,7 +131,7 @@ def make_graph_figure(path_string):
             pred_mid.append(res)
             ax3.axvline(res, color='#f48383', linestyle="-", alpha=1)
 
-    for p, i in enumerate(np.array(parse_txt('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/13/13_ruptures_pred.txt')) * 10.6):
+    for p, i in enumerate(np.array(parse_txt('/data/BPS_FH_Dataset/13/13_ruptures_pred.txt')) * 10.6):
         ax4.axvline(i, color='#f48383', linestyle="-", alpha=1)
 
     ax1.set_xticks([])
@@ -154,7 +154,7 @@ def make_graph_figure(path_string):
 
 
 if __name__ == '__main__':
-    result = make_graph_figure('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/13/13.mid')
+    result = make_graph_figure('/data/BPS_FH_Dataset/13/13.mid')
 
     # print(result)
     # print(f1_score(result["GT"], result["PREDICTED"], 5))

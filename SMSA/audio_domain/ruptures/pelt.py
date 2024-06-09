@@ -33,5 +33,5 @@ class pelt(AudioPeltInterface):
 
 if __name__ == "__main__":
     p = pelt()
-    filename = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1.ogg"
+    filename = "/data/BPS_FH_Dataset/1/1.ogg"
     print(p.predict(filename))

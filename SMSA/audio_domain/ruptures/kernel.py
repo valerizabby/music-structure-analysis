@@ -40,6 +40,6 @@ class kernel(AudioPeltInterface):
 
 if __name__ == "__main__":
     k = kernel()
-    filename = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/1/1.ogg"
+    filename = "/data/BPS_FH_Dataset/1/1.ogg"
     print(k.predict(filename))
 
