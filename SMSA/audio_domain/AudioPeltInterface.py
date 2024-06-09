@@ -1,7 +1,7 @@
 from abc import ABC
 
 
-class AudioDomainSegmenter(ABC):
+class AudioPeltInterface(ABC):
     def __init__(self):
         pass
 

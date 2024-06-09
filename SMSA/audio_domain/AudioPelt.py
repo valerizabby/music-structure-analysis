@@ -9,7 +9,7 @@ class AudioPelt(Segmenter):
     def __init__(self, algo, mode="gt"):
         # algo: ["pelt", "kernel"]
         self.algo = algo
-        # mode = "gt" если gt разметка, "hard" если hard-coded
+        # mode: ["gt", "hard"]
         self.mode = mode
 
     def fit(self, filename):

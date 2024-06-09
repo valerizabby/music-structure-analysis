@@ -2,13 +2,13 @@
 import ruptures as rpt
 import logging as log
 
-from SMSA.audio_domain.AudioDomainSegmenter import AudioDomainSegmenter
+from SMSA.audio_domain.AudioPeltInterface import AudioPeltInterface
 from SMSA.audio_domain.ruptures.utils.tempogram import bkps2sec
 from SMSA.audio_domain.ruptures.utils.tempogram import tempo
 from config import jump, penalty
 
 
-class pelt(AudioDomainSegmenter):
+class pelt(AudioPeltInterface):
     def __init__(self):
         pass
 

@@ -1,4 +1,4 @@
-from SMSA.audio_domain.AudioDomainSegmenter import AudioDomainSegmenter
+from SMSA.audio_domain.AudioPeltInterface import AudioPeltInterface
 import ruptures as rpt
 from SMSA.utils.dataparser import construct_filename_with_your_extension
 import logging as log
@@ -8,8 +8,7 @@ from SMSA.utils.dataparser import parse_txt
 log.basicConfig(level=log.INFO)
 
 
-class kernel(AudioDomainSegmenter):
-
+class kernel(AudioPeltInterface):
     def __init__(self):
         pass
 
