@@ -14,12 +14,10 @@ from musicaiz.features import (
 from musicaiz.features import StructurePrediction
 from musicaiz.datasets.bps_fh import BPSFH
 from config import CONTENT_ROOT
-from models.utils.graph_figure_utils import get_boundaries, get_labels
+from SMSA.utils.dataparser import parse_txt
+from SMSA.symbolic_domain.utils.graph_figure_utils import get_boundaries, get_labels
 from ruptures.metrics import precision_recall
-from models.utils.filename_utils import get_all_BPS_dataset_filenames
-import pandas as pd
 
-from models.utils.parse_result import parse_gt_txt
 
 warnings.filterwarnings("ignore")
 log.basicConfig(level=logging.INFO)
@@ -133,7 +131,7 @@ def make_graph_figure(path_string):
             pred_mid.append(res)
             ax3.axvline(res, color='#f48383', linestyle="-", alpha=1)
 
-    for p, i in enumerate(np.array(parse_gt_txt('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/13/13_ruptures_pred.txt')) * 10.6):
+    for p, i in enumerate(np.array(parse_txt('/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/13/13_ruptures_pred.txt')) * 10.6):
         ax4.axvline(i, color='#f48383', linestyle="-", alpha=1)
 
     ax1.set_xticks([])

@@ -4,6 +4,7 @@
   - Декомпозиция
   - Избавиться от прямого указания путей
   - Конфиг расширить
+  - ДОСТАВАТЬ GT РАЗМЕТКУ ИЗ parse_excel и все пересчитать
 - РЕАДМИ
   - Почищенный репозиторий описать красиво и хорошо
   - Открыть датасет
@@ -18,7 +19,9 @@
   result = algo.predict(pen=pelt_args.penalty) 
   ```
   а я в аудио домене `rpt.KernelCPD(kernel="linear").fit(tempogram.T)`
-  НУЖНО ПРОГНАТЬ ПЕРВЫЙ ПЕЛТ НА ВСЕХ ДАННЫХ И ВНЕСТИ ЕГО КАК 3 АЛГОРИТМ В СРАВНЕНИЕ
+#  НУЖНО ПРОГНАТЬ ПЕРВЫЙ ПЕЛТ НА ВСЕХ ДАННЫХ И ВНЕСТИ ЕГО КАК 3 АЛГОРИТМ В СРАВНЕНИЕ
+- ЗАПУСТИТЬ НА msaf на алгоритме foote
+- ПРОГНАТЬ ВСЕ ЧЕРЕЗ fluidsynth (??)
 - ДАННЫЕ
   - если буду успевать, запустить эту фигню на куске салами
 
@@ -109,4 +112,6 @@ MIR - Music Information Retrieval - хотим сегментировать му
 <a id="1">[1]</a> 
 Carlos Hernandez-Olivan and Sonia Rubio Llamas and Jose R. Beltran. 2023
 Symbolic Music Structure Analysis with Graph Representations and Changepoint Detection Methods
+
+
 
