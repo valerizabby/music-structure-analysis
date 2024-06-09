@@ -2,7 +2,7 @@ from SMSA.audio_domain.AudioDomainSegmenter import AudioDomainSegmenter
 import ruptures as rpt
 from SMSA.utils.dataparser import construct_filename_with_your_extension
 import logging as log
-from SMSA.audio_domain.utils import tempo, bkps2sec
+from SMSA.audio_domain.ruptures.utils.tempogram import tempo, bkps2sec
 from SMSA.utils.dataparser import parse_txt
 
 log.basicConfig(level=log.INFO)
@@ -27,11 +27,15 @@ class kernel(AudioDomainSegmenter):
 
         tempogram, sampling_rate = tempo(filename)
 
-        algo = self.fit(filename, tempogram)
-        log.info("Predicting boundaries")
-        bkps = algo.predict(n_bkps=n_bkps)
-        log.info("Converting boundaries to seconds")
-        result = bkps2sec(bkps, sampling_rate)
+        if n_bkps > 1:
+            algo = self.fit(filename, tempogram)
+            log.info("Predicting boundaries")
+            bkps = algo.predict(n_bkps=n_bkps)
+            log.info("Converting boundaries to seconds")
+            result = bkps2sec(bkps, sampling_rate)
+        else:
+            result = []
+            log.warning(f"NUMBER OF CHANGEPOINTS FOR {filename} IS NOT OK!")
         return result
 
 

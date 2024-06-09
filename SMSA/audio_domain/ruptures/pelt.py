@@ -3,9 +3,9 @@ import ruptures as rpt
 import logging as log
 
 from SMSA.audio_domain.AudioDomainSegmenter import AudioDomainSegmenter
-from SMSA.audio_domain.utils import bkps2sec
-from SMSA.audio_domain.utils import tempo
-from config import min_size, jump, penalty
+from SMSA.audio_domain.ruptures.utils.tempogram import bkps2sec
+from SMSA.audio_domain.ruptures.utils.tempogram import tempo
+from config import jump, penalty
 
 
 class pelt(AudioDomainSegmenter):
@@ -18,7 +18,6 @@ class pelt(AudioDomainSegmenter):
         # minsize = int(signal.shape[0]/14) или типа такого
         print(f"Current min_size {int(signal.T.shape[0] / 15)}")
         algo = rpt.Pelt(model="rbf", min_size=int(signal.T.shape[0] / 15), jump=jump,).fit(signal.T)
-        # algo = rpt.Pelt(model="rbf", min_size=5000, jump=15,).fit(signal.T)
         log.info("Pelt fitted to tempo")
         return algo
 

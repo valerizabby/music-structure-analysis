@@ -18,19 +18,19 @@ class SymbolicPelt(Segmenter):
     def __init__(self):
         pass
 
-    def fit(self):
-        pass
+    def fit(self, filename):
+        file = Path(filename)
+        sp = StructurePrediction(file)
+        return sp
 
-    def predict(self, input_file):
+    def predict(self, filename):
         """
         Params:
             input_file -- абсолютный путь до MIDI файла
         Return:
         """
-        file = Path(input_file)
-        log.info(f"Predicting mid structure for file {input_file}")
-        sp = StructurePrediction(file)
-        result_mid_ms = sp.ms(level="mid", dataset="BPS")
+        log.info(f"Predicting mid structure for file {filename}")
+        result_mid_ms = self.fit(filename).ms(level="mid", dataset="BPS")
         return list(np.array(result_mid_ms) / 1000)
 
 

@@ -113,3 +113,5 @@ MIR - Music Information Retrieval - хотим сегментировать му
 Carlos Hernandez-Olivan and Sonia Rubio Llamas and Jose R. Beltran. 2023
 Symbolic Music Structure Analysis with Graph Representations and Changepoint Detection Methods
 
+
+

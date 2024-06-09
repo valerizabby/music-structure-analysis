@@ -16,7 +16,7 @@ def gt(dataset):
     data = BPSFH(dataset)
     csv = data.parse_anns(anns="mid")
     counts = []
-    for file in make_set_file_to_absolute_path(BPS_absolute_path, "mid"):#list(dataset.glob("*/*.mid")):
+    for file in make_set_file_to_absolute_path(BPS_absolute_path, "mid"):
         # count boundaries
         print(file)
         print(csv[Path(file).stem])
