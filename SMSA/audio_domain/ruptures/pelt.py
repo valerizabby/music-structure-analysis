@@ -16,8 +16,12 @@ class pelt(AudioPeltInterface):
         log.info(f"Using pelt algo to compute segmentation")
         # todo сделать здесь динамический подбор гиперпараметров
         # minsize = int(signal.shape[0]/14) или типа такого
-        print(f"Current min_size {int(signal.T.shape[0] / 15)}")
-        algo = rpt.Pelt(model="rbf", min_size=int(signal.T.shape[0] / 15), jump=jump,).fit(signal.T)
+        print(f"Current min_size {int(signal.T.shape[0] / 8)}")
+        print(f"Current jump {int(signal.T.shape[0] / 800)}")
+        tempogram = signal.T
+        algo = rpt.Pelt(model="rbf",
+                        min_size=int(tempogram.shape[0] / 8),
+                        jump=int(tempogram.shape[0] / 800),).fit(tempogram)
         log.info("Pelt fitted to tempo")
         return algo
 
@@ -33,5 +37,5 @@ class pelt(AudioPeltInterface):
 
 if __name__ == "__main__":
     p = pelt()
-    filename = "/data/BPS_FH_Dataset/1/1.ogg"
+    filename = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/BPS_FH_Dataset/1/1.mp3"
     print(p.predict(filename))

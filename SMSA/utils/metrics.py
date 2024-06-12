@@ -47,6 +47,7 @@ def get_gt_boundaries(path_string: str):
 
     return sec_mid_predicted
 
+
 def f1_score(gt, pred, M=10):
     # фиктивно приравниваем последние элементы
     # The end of the last regime is not the same for each of the partitions
