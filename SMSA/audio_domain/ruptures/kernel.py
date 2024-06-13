@@ -12,13 +12,13 @@ class kernel(AudioPeltInterface):
     def __init__(self):
         pass
 
-    def fit(self, filename, signal):
+    def fit(self, filename: str, signal):
         log.info(f"Using kernel algo to compute segmentation")
         algo = rpt.KernelCPD(kernel="linear").fit(signal.T)
         log.info("Kernel fitted to tempo")
         return algo
 
-    def predict(self, filename, n_bkps_hard=8, mode="gt"):
+    def predict(self, filename: str, n_bkps_hard: int = 8, mode: str = "gt") -> list:
         if mode == "gt":
             n_bkps = len(parse_txt(construct_filename_with_your_extension(filename, "_gt_mid.txt")))
         else:
@@ -40,6 +40,6 @@ class kernel(AudioPeltInterface):
 
 if __name__ == "__main__":
     k = kernel()
-    filename = "/data/BPS_FH_Dataset/1/1.ogg"
+    filename = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/RussianPop/batarei_nervi/batarei_nervi.mp3"
     print(k.predict(filename))
 

@@ -16,7 +16,7 @@ from musicaiz.datasets.bps_fh import BPSFH
 from config import CONTENT_ROOT
 from SMSA.Dataparser import parse_txt
 from SMSA.symbolic_domain.utils.graph_figure_utils import get_boundaries, get_labels
-from ruptures.metrics import precision_recall
+from config import BPS_absolute_path
 
 
 warnings.filterwarnings("ignore")
@@ -26,8 +26,8 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 matplotlib.use('agg')
 
 # dataset = "BPS_FH_Dataset"
-dataset = "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/BPS_FH_Dataset"
-DIRECTORY_FOR_FIGURE = "app/static/Image"
+dataset = BPS_absolute_path
+# DIRECTORY_FOR_FIGURE = "app/static/Image"
 
 
 def array_of_notes_to_end_sec(array_of_notes):
@@ -39,7 +39,11 @@ def array_of_notes_to_end_sec(array_of_notes):
     return array_of_notes[-1].end_sec
 
 
-def make_graph_figure(path_string):
+def make_graph_figure(path_string, result_dir):
+    """
+
+
+    """
     file = Path(path_string)
     filename = file.stem
 
@@ -82,8 +86,6 @@ def make_graph_figure(path_string):
     sec_mid_ground_truth = []
 
     for i in range(len(ref_mid)):
-        # Note(start_sec=1.500000, end_sec=2.000000, start_ticks=288, end_ticks=384)
-        # берем start_sec первой ноты и end_sec последней (?) на самом деле для каждого массива берем последнюю
         if i == 0:
             sec_mid_ground_truth.append(0)
         else:
@@ -135,7 +137,6 @@ def make_graph_figure(path_string):
     ax3.margins(x=0)
     ax4.margins(x=0)
 
-    result_dir = CONTENT_ROOT + DIRECTORY_FOR_FIGURE + "/" + filename + "-figure" + ".png"
     log.info("Saving pic into " + result_dir)
     plt.savefig(result_dir, dpi=300, bbox_inches='tight', pad_inches=0, transparent=False)
     return {"GT": sec_mid_ground_truth, "PREDICTED": sec_mid_predicted}

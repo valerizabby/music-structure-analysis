@@ -3,5 +3,5 @@ from pretty_midi import pretty_midi
 from SMSA.Dataparser import construct_filename_with_your_extension
 
 
-def dur(filename):
+def dur(filename: str):
     return pretty_midi.PrettyMIDI(construct_filename_with_your_extension(filename, ".mid")).get_end_time()

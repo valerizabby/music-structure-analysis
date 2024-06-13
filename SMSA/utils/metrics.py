@@ -48,8 +48,8 @@ def get_gt_boundaries(path_string: str):
     return sec_mid_predicted
 
 
-def f1_score(gt, pred, M=10):
-    # фиктивно приравниваем последние элементы
+def f1_score(gt: list, pred: list, M: int = 10):
+    # фиктивно приравниваем последние элементы, чтобы обойти ошибку
     # The end of the last regime is not the same for each of the partitions
     if (gt[-1] > pred[-1]):
         pred[-1] = gt[-1]
@@ -58,16 +58,3 @@ def f1_score(gt, pred, M=10):
 
     precision, recall = precision_recall(gt, pred, margin=M)
     return 2 * precision * recall / (precision + recall)
-
-
-
-if __name__ == "__main__":
-    # тут код достает гт разметку для всех файлов BPS
-    filename_to_absolute_file = make_set_file_to_absolute_path(BPS_absolute_path, "mid")
-    for filename in filename_to_absolute_file:
-        if filename != '7':
-            print(CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename + "_gt_mid.txt")
-            current_gt = get_gt_boundaries(filename_to_absolute_file[filename])
-            with open(CONTENT_ROOT + "BPS_FH_Dataset/" + filename + "/" + filename + "_gt_mid.txt", 'w') as f:
-                for bound in current_gt:
-                    f.write(str(bound) + "\n")

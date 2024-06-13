@@ -4,7 +4,7 @@ from pathlib import Path
 from config import BPS_absolute_path
 
 
-def parse_txt(filename) -> list:
+def parse_txt(filename: str) -> list:
     """
     Парсит txt файлы (где числа записаны через перенос строки) в лист
     """
@@ -15,7 +15,7 @@ def parse_txt(filename) -> list:
     return data
 
 
-def get_all_files_in_directory(directory, extension):
+def get_all_files_in_directory(directory :str, extension: str):
     """
     Находит все файлы с данным расширением в данной директории
     Params:
@@ -26,7 +26,7 @@ def get_all_files_in_directory(directory, extension):
     return glob.glob(f"{directory}/*/*.{extension}", recursive=True)
 
 
-def make_set_file_to_absolute_path(directory, extension):
+def make_set_file_to_absolute_path(directory: str, extension: str) -> dict:
     """
     Создает словарь: filename -> absolute filename
     """
@@ -37,7 +37,7 @@ def make_set_file_to_absolute_path(directory, extension):
     return file_to_absolute_path
 
 
-def construct_filename_with_your_extension(filename, ext):
+def construct_filename_with_your_extension(filename: str, extension: str):
     """
     Params:
         filename -- абсолютный путь до файла
@@ -45,9 +45,4 @@ def construct_filename_with_your_extension(filename, ext):
     """
     parent_name = Path(filename).parent
     name = Path(filename).stem
-    return f"{parent_name}/{name}{ext}"
-
-
-if __name__ == "__main__":
-    # print(get_all_files_in_directory(BPS_absolute_path, "mid"))
-    print(make_set_file_to_absolute_path(BPS_absolute_path, "mid"))
+    return f"{parent_name}/{name}{extension}"

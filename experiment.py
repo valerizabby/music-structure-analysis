@@ -14,21 +14,15 @@ def dataset_bypass(dataset_abs_path, algo, input_ext, output_ext, to_save=True):
         to_save -- сохранять предсказания или нет (по умолчанию true)
     """
     filename_to_absolute_file = make_set_file_to_absolute_path(dataset_abs_path, input_ext)
-    # 7 29 8 21 15 3 упали по памяти 23 - что то сломано
     for filename in filename_to_absolute_file:
-        if filename != "32" and filename != "20" and filename != "18" and filename != "27" and filename != "9" \
-                and filename != "11" and filename != "7" and filename != "29" and filename != "16" and filename != "6" \
-                and filename != "28" and filename != "1" and filename != "10" and filename != "19" and filename != "26" \
-                and filename != "8" and filename != "21" and filename != "31" and filename != "30" and filename != "24" and filename != "23"\
-                and filename != "4" and filename != "15":
-            name = filename_to_absolute_file[filename]
-            log.info(f"Working with {name}")
-            current_prediction_in_secs = algo.predict(name)
-            print(current_prediction_in_secs)
-            if to_save:
-                with open(construct_filename_with_your_extension(name, output_ext), 'w') as f:
-                    for bound in current_prediction_in_secs:
-                        f.write(str(bound) + "\n")
+        name = filename_to_absolute_file[filename]
+        log.info(f"Working with {name}")
+        current_prediction_in_secs = algo.predict(name)
+        print(current_prediction_in_secs)
+        if to_save:
+            with open(construct_filename_with_your_extension(name, output_ext), 'w') as f:
+                for bound in current_prediction_in_secs:
+                    f.write(str(bound) + "\n")
 
 
 

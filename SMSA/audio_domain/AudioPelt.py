@@ -12,14 +12,14 @@ class AudioPelt(Segmenter):
         # mode: ["gt", "hard"]
         self.mode = mode
 
-    def fit(self, filename):
+    def fit(self, filename: str):
         if self.algo == "kernel":
             return kernel().fit(filename=filename, signal=tempo(filename))
 
         if self.algo == "pelt":
             return pelt().fit(filename=filename, signal=tempo(filename))
 
-    def predict(self, filename, n_bkps_hard=8):
+    def predict(self, filename: str, n_bkps_hard: int = 8) -> list:
         if self.algo == "kernel":
             return kernel().predict(filename=filename, mode=self.mode, n_bkps_hard=n_bkps_hard)
 
