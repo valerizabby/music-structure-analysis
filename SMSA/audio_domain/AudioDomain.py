@@ -5,12 +5,14 @@ from SMSA.audio_domain.ruptures.utils.tempogram import tempo
 from SMSA.Segmenter import Segmenter
 
 
-class AudioPelt(Segmenter):
-    def __init__(self, algo, mode="gt"):
+class AudioDomain(Segmenter):
+    def __init__(self, algo, mode="gt", n=15):
         # algo: ["pelt", "kernel"]
         self.algo = algo
         # mode: ["gt", "hard"]
         self.mode = mode
+        # желаемое число точек изменения в методе pelt
+        self.n = n
 
     def fit(self, filename: str):
         if self.algo == "kernel":
@@ -24,9 +26,9 @@ class AudioPelt(Segmenter):
             return kernel().predict(filename=filename, mode=self.mode, n_bkps_hard=n_bkps_hard)
 
         if self.algo == "pelt":
-            return pelt().predict(filename=filename)
+            return pelt().predict(filename=filename, n=self.n)
 
 
 if __name__ == "__main__":
-    model = AudioPelt(algo='pelt', mode="gt")
+    model = AudioDomain(algo='pelt', mode="gt")
     print(model.predict("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/BPS_FH_Dataset/7/7.mp3"))

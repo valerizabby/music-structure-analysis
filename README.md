@@ -61,6 +61,16 @@ tolerance = 10 sec
 |   BPS    |    0.417     | 0.503                 | 0.459                    |
 |  RPM     | 0.575        | 0.598                 | 0.597                    |
 
+
+## Расшифровка названий предсказаний
+- BPS: 
+  - gt_mid - разметка
+  - ruptures_pred_11 - AudioDomain(algo=kernel, mode=hard)
+  - ruptures_pred - AudioDomain(algo=kernel, mode=gt)
+  - symbolic_pred - SymbolicDomain(algo=pelt)
+  - symbolic_pred_kernel_gt - SymbolicDomain(algo=kernel, mode=gt)
+  - symbolic_pred_kernel_hard - SymbolicDomain(algo=kernel, mode=hard)
+
 ## References
 <a id="1">[1]</a> 
 Carlos Hernandez-Olivan and Sonia Rubio Llamas and Jose R. Beltran. 2023
