@@ -26,4 +26,5 @@ class pelt(SymbolicDomainInterface):
 
 
 if __name__ == '__main__':
-    print(pelt().predict("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/BPS_FH_Dataset/1/1.mid"))
+    pass
+    # print(pelt().predict("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/BPS_FH_Dataset/1/1.mid"))

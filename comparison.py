@@ -9,14 +9,6 @@ from SMSA.utils.metrics import f1_score
 log.basicConfig(level=log.INFO)
 
 
-# todo запустить на бпс
-# все добавить в сравнение
-# переделать рисунок интерфейса и пайплайна
-# посчитать сложность вычисления чистого пелта на бпс
-
-
-# написать всякие описания
-
 def meantime_custom(gt, pred, M=10):
     # фиктивно приравниваем последние элементы
     # The end of the last regime is not the same for each of the partitions

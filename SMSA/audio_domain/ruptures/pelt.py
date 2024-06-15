@@ -66,9 +66,9 @@ class pelt(AudioPeltInterface):
 
 
 if __name__ == "__main__":
-
-    filename_to_absolute_file = make_set_file_to_absolute_path(RUSSIAN_POP_ABSOLUTE_PATH, "mp3")
-    print(filename_to_absolute_file)
+    pass
+    # filename_to_absolute_file = make_set_file_to_absolute_path(RUSSIAN_POP_ABSOLUTE_PATH, "mp3")
+    # print(filename_to_absolute_file)
     # for filename in filename_to_absolute_file:
     #     name = filename_to_absolute_file[filename]
     #     log.info(f"Working with {name}")
