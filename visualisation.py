@@ -55,8 +55,8 @@ def make_graph_figure(path_string, result_dir):
     log.info("Making picture...")
 
     fig, axes = plt.subplots(
-        nrows=6, ncols=1, figsize=(20, 9), dpi=300,
-        gridspec_kw={'height_ratios': [60, 8, 8, 8, 8, 8]})
+        nrows=7, ncols=1, figsize=(20, 12), dpi=350,
+        gridspec_kw={'height_ratios': [60, 8, 8, 8, 8, 8, 8]})
 
     ax1 = axes[0]
     ax2 = axes[1]
@@ -64,14 +64,15 @@ def make_graph_figure(path_string, result_dir):
     ax4 = axes[3]
     ax5 = axes[4]
     ax6 = axes[5]
+    ax7 = axes[6]
 
     ax1.set_xlabel("novelty curve")
     ax2.set_xlabel("ground-truth")
     ax3.set_xlabel("SymbolicDomain(pelt)")
-    ax4.set_xlabel("AudioDomain(kernel, gt)")
-    ax5.set_xlabel("AudioDomain(kernel, hard)")
-    ax6.set_xlabel("SymbolicDomain(kernel, gt)")
-
+    ax4.set_xlabel("SymbolicDomain(kernel, hard)")
+    ax5.set_xlabel("SymbolicDomain(kernel, gt)")
+    ax6.set_xlabel("AudioDomain(kernel, hard)")
+    ax7.set_xlabel("AudioDomain(kernel, gt)")
 
     sec_mid_predicted = []
     sec_mid_ground_truth = []
@@ -94,14 +95,17 @@ def make_graph_figure(path_string, result_dir):
             pred_mid.append(res)
             ax3.axvline(res, color='#f48383', linestyle="-", alpha=1)
 
-    for p, i in enumerate(np.array(parse_txt(construct_filename_with_your_extension(path_string, "_ruptures_pred.txt"))) * 10.6):
+    for p, i in enumerate(np.array(parse_txt(construct_filename_with_your_extension(path_string, "_symbolic_pred_kernel_hard.txt"))) * 10.6):
         ax4.axvline(i, color='#f48383', linestyle="-", alpha=1)
 
-    for p, i in enumerate(np.array(parse_txt(construct_filename_with_your_extension(path_string, "_ruptures_pred_8.txt"))) * 10.6):
+    for p, i in enumerate(np.array(parse_txt(construct_filename_with_your_extension(path_string, "_symbolic_pred_kernel_gt.txt"))) * 10.6):
         ax5.axvline(i, color='#f48383', linestyle="-", alpha=1)
 
-    for p, i in enumerate(np.array(parse_txt(construct_filename_with_your_extension(path_string, "_symbolic_pred_kernel_gt.txt"))) * 10.6):
+    for p, i in enumerate(np.array(parse_txt(construct_filename_with_your_extension(path_string, "_ruptures_pred_8.txt"))) * 10.6):
         ax6.axvline(i, color='#f48383', linestyle="-", alpha=1)
+
+    for p, i in enumerate(np.array(parse_txt(construct_filename_with_your_extension(path_string, "_ruptures_pred.txt"))) * 10.6):
+        ax7.axvline(i, color='#f48383', linestyle="-", alpha=1)
 
     ax1.set_xticks([])
     ax2.set_xticks([])
@@ -114,6 +118,8 @@ def make_graph_figure(path_string, result_dir):
     ax5.set_yticks([])
     ax6.set_xticks([])
     ax6.set_yticks([])
+    ax7.set_xticks([])
+    ax7.set_yticks([])
 
 
     ax1.margins(x=0)
@@ -122,15 +128,16 @@ def make_graph_figure(path_string, result_dir):
     ax4.margins(x=0)
     ax5.margins(x=0)
     ax6.margins(x=0)
+    ax7.margins(x=0)
 
     log.info("Saving pic into " + result_dir)
-    plt.savefig(result_dir, dpi=300, bbox_inches='tight', pad_inches=0, transparent=False)
+    plt.savefig(result_dir, dpi=350, bbox_inches='tight', pad_inches=0, transparent=False)
     return {"GT": sec_mid_ground_truth, "PREDICTED": sec_mid_predicted}
 
 
 if __name__ == "__main__":
      make_graph_figure("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/RussianPop/meloch_kiskis/meloch_kiskis.mid",
-                       "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/")
+                       "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/visualisation.png")
 
      # make_graph_figure("/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/BPS_FH_Dataset/1/1.mid",
      #                   "/Users/21415968/Desktop/diploma/symbolic-music-structure-analysis/data/")
